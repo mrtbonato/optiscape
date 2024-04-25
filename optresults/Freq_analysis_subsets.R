@@ -1,7 +1,7 @@
 ###################################################
 
-# Title: Frequency analysis
-# Purpose: This code is used to analyse the frequency of implementation of AEP
+# Title: Frequency analysis subsets
+# Purpose: This code is used to analyse the frequency of implementation of AEP of selected subsets
 # Reference: 
 # Author: Marta Bonato 
 # Date: last modified on 25 April 2024
@@ -63,6 +63,7 @@ BestSol_fit <- BestSol2[, 302:305]
 names(BestSol_fit) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
 
 
+
 ## Select data for land use maps analysis
 # Select only fitness values
 BestSol_genome <- BestSol2[, 1:301]
@@ -81,6 +82,73 @@ names(StatusQuo) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
 StatusQuo[1,] <- c(0.00161, 0.0508, -8630.0, 54306.687)
 
 
+
+
+
+## Create subgroups to analyse
+BestSol_fit$sub <- 0
+
+BestSol_fit_sub <- BestSol_fit %>%
+  mutate(sub = case_when(
+    # High AP - Low Biod
+    (AgrPrd >= 54225.00 & HabCnt < 0.001650) ~ 1,
+    # High AP - High Biod
+    (AgrPrd >= 54225.00 & HabCnt >= 0.001850) ~ 2,
+    # Low AP - High Biod
+    (AgrPrd < 53300 & HabCnt >= 0.001852) ~3,
+    # Low AP - High Wtr
+    (AgrPrd < 53300 & WtrQlt >= -7380) ~ 4,
+    # Tipping point water
+    (AgrPrd < 54000 & AgrPrd >= 53800 & WtrQlt >= - 7445) ~ 5,
+    # Compromise solution
+    (AgrPrd <= 54000 & AgrPrd >= 53920 & WtrQlt >= - 7550 & HabCnt >= 0.00185) ~ 6
+  )) 
+
+
+# Select subset of data to analyse
+# High AP - Low Biod
+BestSol2_sub1 <- BestSol2 %>%
+  filter(V305 >= 54225.0 & V302 <= 0.001650)
+
+# High AP - High Biod
+BestSol2_sub2 <- BestSol2 %>%
+  filter(V305 >= 54225.0 & V302 >= 0.00185)
+
+# Low AP - High Biod
+BestSol2_sub3 <- BestSol2 %>%
+  filter(V305 < 53300 & V302 >= 0.001852)
+
+# Low AP - High Wtr
+BestSol2_sub4 <- BestSol2 %>%
+  filter(V305 < 53300 & V304 >= -7380)
+
+# Tipping point water
+BestSol2_sub5 <- BestSol2 %>%
+  filter(V305 <= 54000 & V305 >= 53800 & V304 >= - 7445) 
+
+# Compromise solution
+BestSol2_sub6 <- BestSol2 %>%
+  filter(V305 <= 54000 & V305 >= 53920 & V304 >= - 7550 & V302 >= 0.00185) 
+
+
+
+# BestSol2_sub7 <- BestSol2 %>%
+#   filter(V302 <= 0.001775 & V303 >= 0.05375 & V303 <= 0.054)
+# 
+# BestSol2_sub8 <- BestSol2 %>%
+#   filter(V302 >= 0.001775 & V303 >= 0.05375 & V303 <= 0.054) 
+# 
+# 
+# BestSol2_sub9 <- BestSol2 %>%
+#   filter(V302 <= 0.0018 & V303 >= 0.05425 & V303 <= 0.05475)
+# 
+# BestSol2_sub10 <- BestSol2 %>%
+#   filter(V302 >= 0.0018 & V303 >= 0.05425 & V303 <= 0.05475) 
+
+
+
+
+# Plot
 
 
 
@@ -327,14 +395,14 @@ lu_Schoeps_AEP_freq <- lu_Schoeps2 %>%
 
 # Summarize frequency for polygon (based on same hru) to not double account polygons
 lu_Schoeps_AEP_freq_group <- lu_Schoeps_AEP_freq %>%
-   group_by(name.x) %>%
-   summarize(freq2 = sum(freq))
- 
- 
+  group_by(name.x) %>%
+  summarize(freq2 = sum(freq))
+
+
 # Draw frequency map
 m1 <- tm_shape(lu_Schoeps_AEP_freq_group) + 
- tm_fill('freq2', breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
- tm_layout(legend.position = c("right", "bottom"))
+  tm_fill('freq2', breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
+  tm_layout(legend.position = c("right", "bottom"))
 
 m1 
 
@@ -455,140 +523,3 @@ lowtill_sub5 <- lu_Schoeps_AEP_freq_lowtill_group  %>%
 # Write shp
 z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output", "lu_Schoeps_AEP_freq_sub6_LT_2603.shp")
 write_sf(lu_Schoeps_AEP_freq_lowtill_group, z)
-
-
-
-
-
-
-###############################################################################
-
-# COUNT HOW MANY AEP ARE ACTIVATED FOR EACH BEST SOLUTION
-
-# Add column for number of AEP activated
-BestSol_fit$count <- NA
-
-# loop through solutions to count AEP implemented
-for (genome in 1:n_genomes){
-  polygon_genome_column = Impl_AEP_bind[,8+genome]
-  AEP_count <- sapply(polygon_genome_column, function(x) sum(x == "2")) 
-  
-  BestSol_fit[genome,5] <- AEP_count
-}
-
-
-
-## Plot
-# 2-dimensional pareteo frontier between Agricultural production and Water Quality
-p2 <- ggplot() +
-  #theme_light() +
-  geom_hline(yintercept = 54306.887, color = "gray50") +
-  geom_vline(xintercept = -8630.0, color = "gray50") +
-  geom_rect(aes(xmin = StatusQuo$WtrQlt, xmax = Inf,
-                ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  #geom_point(data = ordered, aes(x= WtrQlt, y = AgrPrd), colour = 'darkred') +
-  #geom_line(data = ordered, aes(x= WtrQlt, y = AgrPrd), colour = 'darkred') +
-  geom_point(data = BestSol_fit, aes(x = WtrQlt, y = AgrPrd, color = count)) +
-  #stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = WtrQlt, y = AgrPrd, group = sub, color = sub)) +
-  # Change names labels
-  labs(x = "Phorsphorus load",
-       y = "Crop yield") +
-  scale_color_viridis_c(name = " AEP count") + 
-  theme(text=element_text(size=18), legend.position = "none")
-
-
-# 2-dimensional pareteo frontier between Agricultural production and Habitat Connectivity
-p3 <- ggplot() +
-  geom_hline(yintercept = 54306.887, color = "gray50") +
-  geom_vline(xintercept = 0.00161, color = "gray50") +
-  geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
-                ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = BestSol_fit, aes(x = HabCnt, y = AgrPrd, color = count)) +
-  #stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabCnt, y = AgrPrd, group = sub, color = sub)) +
-  #geom_point(data = ordered, aes(x= HabCnt, y = AgrPrd), colour = 'darkred') +
-  #geom_line(data = ordered, aes(x= HabCnt, y = AgrPrd), colour = 'darkred') +
-  # Change names labels
-  labs(x = "Probability of connectivity",
-       y = "Crop yield") +
-  scale_color_viridis_c(name = "AEP count") + 
-  theme(text=element_text(size=18), legend.position = "none")
-
-
-# 2-dimensional pareteo frontier between Agricultural production and Habitat Quality
-p4 <- ggplot() +
-  geom_hline(yintercept = 54306.887, color = "gray50") +
-  geom_vline(xintercept = 0.0508, color = "gray50") +
-  geom_rect(aes(xmin = StatusQuo$HabQlt, xmax = Inf,
-                ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = BestSol_fit, aes(x = HabQlt, y = AgrPrd, color = count)) +
-  #stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabQlt, y = AgrPrd, group = sub, color = sub)) +
-  #geom_point(data = ordered, aes(x= HabQlt, y = AgrPrd), colour = 'darkred') +
-  #geom_line(data = ordered, aes(x= HabQlt, y = AgrPrd), colour = 'darkred') +
-  # Change names labels
-  labs(x = "Habitat quality",
-       y = "Crop yield") +
-  scale_color_viridis_c(name = "AEP count") + 
-  theme(text=element_text(size=18))
-
-
-# 2-dimensional pareteo frontier between Water Quality and Habitat Connectivity
-p5 <- ggplot() +
-  geom_hline(yintercept = -8630.0, color = "gray50") +
-  geom_vline(xintercept = 0.00161, color = "gray50") +
-  geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
-                ymin = StatusQuo$WtrQlt, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = BestSol_fit, aes(x = HabCnt, y = WtrQlt, color = count)) +
-  #stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabCnt, y = WtrQlt, group = sub, color = sub)) +
-  #geom_point(data = ordered, aes(x= HabCnt, y = WtrQlt), colour = 'darkred') +
-  #geom_line(data = ordered, aes(x= HabCnt, y = WtrQlt), colour = 'darkred') +
-  # Change names labels
-  labs(x = "Probability of connectivity",
-       y = "Phorsphorus load") +
-  scale_color_viridis_c(name = "AEP count") + 
-  theme(text=element_text(size=18), legend.position = "none")
-
-
-# 2-dimensional pareteo frontier between Water Quality and Habitat Quality
-p6 <- ggplot() +
-  geom_hline(yintercept = -8630.0, color = "gray50") +
-  geom_vline(xintercept = 0.0508, color = "gray50") +
-  geom_rect(aes(xmin = StatusQuo$HabQlt, xmax = Inf,
-                ymin = StatusQuo$WtrQlt, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = BestSol_fit, aes(x = HabQlt, y = WtrQlt, color = count)) +
-  #stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabQlt, y = WtrQlt, group = sub, color = sub)) +
-  #geom_point(data = ordered, aes(x= HabQlt , y = WtrQlt), colour = 'darkred') +
-  #geom_line(data = ordered, aes(x= HabQlt , y = WtrQlt), colour = 'darkred') +
-  # Change names labels
-  labs(x = "Habitat quality",
-       y = "Phorsphorus load") +
-  scale_color_viridis_c(name = "AEP count") + 
-  theme(text=element_text(size=18), legend.position = "none")
-
-
-# 2-dimensional pareteo frontier between Habitat Quality and Habitat Connectivity
-p7 <- ggplot() +
-  geom_hline(yintercept = 0.0508, color = "gray50") +
-  geom_vline(xintercept = 0.00161, color = "gray50") +
-  geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
-                ymin = StatusQuo$HabQlt, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = BestSol_fit, aes(x = HabCnt, y = HabQlt, color = count)) +
-  #stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabCnt, y = HabQlt, group = sub, color = sub)) +
-  #geom_point(data = ordered, aes(x= HabCnt, y = HabQlt), colour = 'darkred') +
-  #geom_line(data = ordered, aes(x= HabCnt, y = HabQlt), colour = 'darkred') +
-  # Change names labels
-  labs(x = "Probability of connectivity",
-       y = "Habitat quality") +
-  scale_color_viridis_c(name = "AEP count") + 
-  theme(text=element_text(size=18), legend.position = "none")
-
-
-# Plot plots close to one another
-patchwork4 <- (p2 | p3 | p4) /
-  (p7 | p5 | p6)
-patchwork4
-
-# Save plot
-ggsave(file = "plots/AEP_count_1403.png",
-       width = 360, height = 210, units = "mm")
-
-
