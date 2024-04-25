@@ -148,7 +148,148 @@ BestSol2_sub6 <- BestSol2 %>%
 
 
 
-# Plot
+# PLOT SUBSETS
+# Plot Pareto frontier with ellipses identifying chosen subsets
+
+# Plot agriculture - water quality
+p2 <- ggplot() +
+  #theme_light() +
+  geom_hline(yintercept = 54306.887, color = "gray50") +
+  geom_vline(xintercept = -8630.0, color = "gray50") +
+  geom_rect(aes(xmin = StatusQuo$WtrQlt, xmax = Inf,
+                ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = BestSol_fit_sub, aes(x = WtrQlt, y = AgrPrd), color = "#21908CFF") +
+  #geom_point(data = BestSol2_sub1, aes(x = V304, y = V305), color = "red") +
+  #geom_point(data = BestSol2_sub2, aes(x = V304, y = V305), color = "orange") +
+  #geom_point(data = BestSol2_sub4, aes(x = V304, y = V305), color = "green") +
+  #geom_point(data = BestSol2_sub3, aes(x = V304, y = V305), color = "yellow") +
+  #geom_point(data = BestSol2_sub6_2, aes(x = V304, y = V305), color = "blue") +
+  #geom_point(data = BestSol2_sub10, aes(x = V304, y = V305), color = "lightblue") +
+  stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = WtrQlt, y = AgrPrd, group = sub, color = sub)) +
+  scale_color_distiller(palette = "Dark2") +
+  # Change names labels
+  labs(x = "Phorsphorus load",
+       y = "Crop yield") +
+  theme(text=element_text(size=18), legend.position = "none")
+
+
+# Plot agriculture - habitat connectivity
+p3 <- ggplot() +
+  geom_hline(yintercept = 54306.687, color = "gray50") +
+  geom_vline(xintercept = 0.00161, color = "gray50") +
+  geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
+                ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF", alpha = .2) +
+  geom_point(data = BestSol_fit_sub, aes(x = HabCnt, y = AgrPrd), color = "#21908CFF") +
+  #geom_point(data = BestSol2_sub1, aes(x = V302, y = V305), color = "red") +
+  #geom_point(data = BestSol2_sub2, aes(x = V302, y = V305), color = "orange") + 
+  #geom_point(data = BestSol2_sub4, aes(x = V302, y = V305), color = "green") +
+  #geom_point(data = BestSol2_sub3, aes(x = V302, y = V305), color = "yellow") +
+  #geom_point(data = BestSol2_sub5, aes(x = V302, y = V305), color = "blue") +
+  #geom_point(data = BestSol2_sub6_2, aes(x = V302, y = V305), color = "lightblue")+
+  stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabCnt, y = AgrPrd, group = sub, color = sub)) +
+  scale_color_distiller(palette = "Dark2") +
+  # Change names labels
+  labs(x = "Probability of connectivity",
+       y = "Crop yield") +
+  theme(text=element_text(size=18), legend.position = "none")
+
+
+# Plot agriculture - habitat quality
+p4 <- ggplot() +
+  geom_hline(yintercept = 54306.687, color = "gray50") +
+  geom_vline(xintercept = 0.0508, color = "gray50") +
+  geom_rect(aes(xmin = StatusQuo$HabQlt, xmax = Inf,
+                ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = BestSol_fit_sub, aes(x = HabQlt, y = AgrPrd), color = "#21908CFF") +
+  #geom_point(data = BestSol2_sub1, aes(x = V303, y = V305), color = "red") +
+  #geom_point(data = BestSol2_sub2, aes(x = V303, y = V305), color = "orange") +
+  #geom_point(data = BestSol2_sub4, aes(x = V303, y = V305), color = "green") +
+  #geom_point(data = BestSol2_sub3, aes(x = V303, y = V305), color = "yellow") +
+  #geom_point(data = BestSol2_sub5, aes(x = V303, y = V305), color = "blue") +
+  #geom_point(data = BestSol2_sub6_2, aes(x = V303, y = V305), color = "lightblue") +
+  stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabQlt, y = AgrPrd, group = sub, color = sub)) +
+  scale_color_distiller(palette = "Dark2") +
+  # Change names labels
+  labs(x = "Habitat quality",
+       y = "Crop yield") +
+  theme(text=element_text(size=18), legend.position = "none")
+
+
+# Plot water quality - habitat connectivity
+p5 <- ggplot() +
+  geom_hline(yintercept = -8630.0, color = "gray50") +
+  geom_vline(xintercept = 0.00161, color = "gray50") +
+  geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
+                ymin = StatusQuo$WtrQlt, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = BestSol_fit_sub, aes(x = HabCnt, y = WtrQlt), color = "#21908CFF") +
+  # geom_point(data = BestSol2_sub1, aes(x = V302, y = V304), color = "red") +
+  # geom_point(data = BestSol2_sub2, aes(x = V302, y = V304), color = "orange") +
+  # geom_point(data = BestSol2_sub4, aes(x = V302, y = V304), color = "green") +
+  # geom_point(data = BestSol2_sub3, aes(x = V302, y = V304), color = "yellow") +
+  # geom_point(data = BestSol2_sub5, aes(x = V302, y = V304), color = "blue") +
+  # geom_point(data = BestSol2_sub6_2, aes(x = V302, y = V304), color = "lightblue") +
+  stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabCnt, y =  WtrQlt, group = sub, color = sub)) +
+  scale_color_distiller(palette = "Dark2") +
+  # Change names labels
+  labs(x = "Probability of connectivity",
+       y = "Phorsphorus load") +
+  theme(text=element_text(size=18), legend.position = "none")
+
+
+# Plot water quality - habitat connectivity
+p6 <- ggplot() +
+  geom_hline(yintercept = -8630.0, color = "gray50") +
+  geom_vline(xintercept = 0.0508, color = "gray50") +
+  geom_rect(aes(xmin = StatusQuo$HabQlt, xmax = Inf,
+                ymin = StatusQuo$WtrQlt, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = BestSol_fit, aes(x = HabQlt, y = WtrQlt), color = "#21908CFF") +
+  # geom_point(data = BestSol2_sub1, aes(x = V303, y = V304), color = "red") +
+  # geom_point(data = BestSol2_sub2, aes(x = V303, y = V304), color = "orange") +
+  # geom_point(data = BestSol2_sub4, aes(x = V303, y = V304), color = "green") +
+  # geom_point(data = BestSol2_sub3, aes(x = V303, y = V304), color = "yellow") +
+  # geom_point(data = BestSol2_sub5, aes(x = V303, y = V304), color = "blue") +
+  # geom_point(data = BestSol2_sub6_2, aes(x = V303, y = V304), color = "lightblue") +
+  stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabQlt, y = WtrQlt, group = sub, color = sub)) +
+  scale_color_distiller(palette = "Dark2") +
+  # Change names labels
+  labs(x = "Habitat quality",
+       y = "Phorsphorus load") +
+  theme(text=element_text(size=18), legend.position = "none")
+
+
+# Plot habitat quality - habitat connectivity
+p7 <- ggplot() +
+  geom_hline(yintercept = 0.0508, color = "gray50") +
+  geom_vline(xintercept = 0.00161, color = "gray50") +
+  geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
+                ymin = StatusQuo$HabQlt, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = BestSol_fit_sub, aes(x = HabCnt, y = HabQlt), color = "#21908CFF") +
+  #geom_point(data = BestSol2_sub1, aes(x = V302, y = V303), color = "red") +
+  #geom_point(data = BestSol2_sub2, aes(x = V302, y = V303), color = "orange") +
+  # geom_point(data = BestSol2_sub7, aes(x = V302, y = V303), color = "green") +
+  # geom_point(data = BestSol2_sub8, aes(x = V302, y = V303), color = "yellow") +
+  # geom_point(data = BestSol2_sub9, aes(x = V302, y = V303), color = "blue") +
+  # geom_point(data = BestSol2_sub10, aes(x = V302, y = V303), color = "lightblue") +
+  stat_ellipse(data = BestSol_fit_sub %>% filter(sub != 0), aes(x = HabCnt, y =  HabQlt, group = sub, color = sub)) +
+  scale_color_distiller(palette = "Dark2") +
+  # Change names labels
+  labs(x = "Probability of connectivity",
+       y = "Habitat quality") +
+  theme(text=element_text(size=18), legend.position = "none")
+
+
+# Plot plots close to one another
+patchwork <- (p2 | p3 | p4) /
+  (p7 | p5 | p6)
+patchwork
+
+
+# Save plot
+ggsave(file = "plots/subsets_1303.png",
+       width = 360, height = 210, units = "mm")
+
+
+
 
 
 
