@@ -65,18 +65,6 @@ BestSol_fit <- BestSol2[, 302:305]
 names(BestSol_fit) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
 
 
-## Select data for land use maps analysis
-# Select only fitness values
-BestSol_genome <- BestSol2[, 1:301]
-
-# Pivot table
-BestSol_genome2 <- data.frame(t(BestSol_genome))
-
-# Add id column
-BestSol_genome2 <- BestSol_genome2 %>%
-  mutate(id = c(1:301), .before = X1)
-
-
 # Create dataframe with status quo value
 StatusQuo <- data.frame(matrix(data=NA, nrow=1, ncol=4))
 names(StatusQuo) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
