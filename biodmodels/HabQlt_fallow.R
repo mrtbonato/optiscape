@@ -10,8 +10,8 @@
 ###################################################
 
 
-setwd("D:/bonato/Opt_05_24/CoMOLA_base/models/HabQlt")
-sink("D:/bonato/Opt_05_24/CoMOLA_base/models/HabQlt/console.txt", append=FALSE)
+setwd("D:/bonato/Opt_05_24/CoMOLA_fallow/models/HabQlt")
+sink("D:/bonato/Opt_05_24/CoMOLA_fallow/models/HabQlt/console.txt", append=FALSE)
 
 
 
@@ -90,6 +90,12 @@ for(i in 1:dim(genome)[1]){
     
     if(substr(genome_hru$name[i],1,4) == "lowt"){
       lu_Schoeps$lowtill[idx2] <- 1
+    }
+	
+	if(substr(genome_hru$name[i],1,4) %in% c("fall")){
+      lu_Schoeps$field_gras_w[idx2] <- lu_Schoeps$lu_3[idx2]
+      lu_Schoeps$lu_1[idx2] <- "fall" 
+      lu_Schoeps$lu_3[idx2] <- "fall" ## lu_3 update if measure should be not considered as field
     }
     
     if(substr(genome_hru$name[i],1,4) %in% c("gras","buff")){

@@ -10,8 +10,8 @@
 ###################################################
 
 
-setwd("D:/bonato/Opt_05_24/CoMOLA_base/models/HabCnt")
-sink("D:/bonato/Opt_05_24/CoMOLA_base/models/HabCnt/console.txt", append=FALSE)
+setwd("D:/bonato/Opt_05_24/CoMOLA_fallow/models/HabCnt")
+sink("D:/bonato/Opt_05_24/CoMOLA_fallow/models/HabCnt/console.txt", append=FALSE)
 
 
 
@@ -93,7 +93,7 @@ for(i in 1:dim(genome)[1]){
     lu_Schoeps$lowtill[idx2] <- 1
     }
 	
-    if(substr(genome_hru$name[i],1,4) %in% c("gras","buff")){
+    if(substr(genome_hru$name[i],1,4) %in% c("gras","buff", "fall")){
       lu_Schoeps$field_gras_w[idx2] <- lu_Schoeps$lu_3[idx2]
       lu_Schoeps$lu_1[idx2] <- "rnge" 
       lu_Schoeps$lu_3[idx2] <- "rnge" ## lu_3 update if measure should be not considered as field
