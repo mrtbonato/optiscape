@@ -1,8 +1,8 @@
 
 ###################################################
 
-# Title: Trade_offs_analysis
-# Purpose: This code is used to analyse the trade-offs: magnitude and Pareto-frontier
+# Title: Cluster_analysis
+# Purpose: This code is used to individuate clusters along the Pareto-frontier
 # Reference: 
 # Author: Marta Bonato 
 # Date: last modified on 09 July 2024
@@ -213,7 +213,10 @@ ggplot() +
 
 
 
-################################
+######### Other plot #######################
+
+# Plot with different colors indicating solutions in different clusters
+
 # Create subsets based on cluster code
 BS_fitness_sub1 <- BS_fitness %>%
   filter(cluster == 1)

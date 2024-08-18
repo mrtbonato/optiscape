@@ -1,7 +1,7 @@
 ###################################################
 
-# Title: Trade_offs_analysis
-# Purpose: This code is used to analyse the trade-offs: magnitude and Pareto-frontier
+# Title: Trade_offs_comparison
+# Purpose: This code is used to compare the Pareto frontiers of the baseline and policy-related scenarios.
 # Reference: 
 # Author: Marta Bonato 
 # Date: last modified on 09 July 2024

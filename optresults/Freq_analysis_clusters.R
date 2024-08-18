@@ -1,7 +1,7 @@
 ###################################################
 
-# Title: Frequency analysis
-# Purpose: 
+# Title: Frequency analysis clusters
+# Purpose: This code is used to analyse the frequency of AEP implementation for the Best Solutions beloging to each cluster.
 # Reference: 
 # Author: Marta Bonato 
 # Date: last modified on 19 July 2024

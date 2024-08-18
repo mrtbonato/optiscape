@@ -1,7 +1,7 @@
 ###################################################
 
-# Title: Trade_offs_analysis
-# Purpose: This code is used to analyse the trade-offs: magnitude and Pareto-frontier
+# Title: Frequency_analysis_all
+# Purpose: This code is used to analyse the frequency of AEP implementation when considering all the Best Solutions together
 # Reference: 
 # Author: Marta Bonato 
 # Date: last modified on 09 July 2024
@@ -337,118 +337,6 @@ for (m in meas){
   write_sf(meas_buffer, z)
 }
 
-
-# Reduced tillage
-# Filter reduced tillage
-lu_Schoeps_AEP_freq_lowtill <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "lowtillcc")
-
-# Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
-lu_Schoeps_AEP_freq_lowtill_group <- lu_Schoeps_AEP_freq_lowtill %>%
-  group_by(name_new) %>%
-  summarize(freq2 = sum(freq))
-
-# Write shp
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_lowtill_all_0608.shp")
-write_sf(lu_Schoeps_AEP_freq_lowtill_group, z)
-
-
-# # plot map
-# map <- ggplot(lowtill_class) +
-#   geom_sf(aes(fill=freq2), colour = NA) +
-#   theme_minimal() + 
-#   scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 50, name = "Frequency of AEP implementation")
-
-# Save plot
-#ggsave(file = paste0("Frequency_map_lowtill_", n, ".png"),
-#       width = 210, height = 297, units = "mm")
-
-
-
-
-# Landscape elements
-# Filter landscape elements
-lu_Schoeps_AEP_freq_landelem <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "pond" | nswrm == "grassslope" | nswrm == "buffer" | nswrm == "hedge")
-
-# Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
-lu_Schoeps_AEP_freq_landelem_group <- lu_Schoeps_AEP_freq_landelem %>%
-  group_by(name_new) %>%
-  summarize(freq2 = sum(freq))
-
-# Classify frequency in low/medium/high
-landelem_class <- lu_Schoeps_AEP_freq_landelem_group  %>%
-  mutate(class = case_when(
-    freq2 == 0 ~ "0",
-    freq2 > 0 & freq2 < 33 ~ "Low",
-    freq2 >= 33 & freq2 < 66 ~ "Medium",
-    freq2 >= 66 & freq2 < 100 ~ "High",
-    freq2 == 100 ~ "100"
-  ))
-
-# # Write shp
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_landelem_all.shp")
-write_sf(lu_Schoeps_AEP_freq_landelem_group, z)
-
-
-# plot map
-map <- ggplot() +
-  geom_sf(data = landelem_class, mapping = aes(fill=freq2), colour = NA) +
-  theme_minimal() + 
-  scale_fill_gradient2(low = "yellow", mid = "orange", high = "red", midpoint = 50, name = "Frequency of AEP implementation")
-
-# Save plot
-#ggsave(file = paste0("Frequency_map_lanelem_", n, ".png"),
-#       width = 210, height = 297, units = "mm")
-
-
-
-# Grassed waterways
-# Filter grassed waterways
-lu_Schoeps_AEP_freq_grassslope <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "grassslope")
-
-# Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
-lu_Schoeps_AEP_freq_grassslope_group <- lu_Schoeps_AEP_freq_grassslope %>%
-  group_by(name_new) %>%
-  summarize(freq2 = sum(freq))
-
-#Write shp
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_grassslope_all_0608.shp")
-write_sf(lu_Schoeps_AEP_freq_grassslope_group, z)
-
-
-
-# Buffer strips
-# Filter buffer strips
-lu_Schoeps_AEP_freq_buffer <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "buffer")
-
-# Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
-lu_Schoeps_AEP_freq_buffer_group <- lu_Schoeps_AEP_freq_buffer %>%
-  group_by(name_new) %>%
-  summarize(freq2 = sum(freq))
-
-# Write shp
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_buffer_all_0608.shp")
-write_sf(lu_Schoeps_AEP_freq_buffer_group, z)
-
-
-
-# Hedgerows
-# Filter hedges
-lu_Schoeps_AEP_freq_hedge <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "hedge")
-
-# Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
-lu_Schoeps_AEP_freq_hedge_group <- lu_Schoeps_AEP_freq_hedge %>%
-  group_by(name_new) %>%
-  summarize(freq2 = sum(freq))
-
-
-# Write shp
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_hedge.shp")
-write_sf(lu_Schoeps_AEP_freq_hedge_group, z)
 
 
 
