@@ -153,8 +153,8 @@ BS_fitness <- read.csv('Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/CoMOLA
 kplot <- ggplot() +
   #theme_light() +
   #geom_point(data = BS_fitness, aes(x = WtrQlt, y = AgrPrd), color = "grey") +
-  geom_point(data = BS_fitness, aes(x = WtrQlt, y = AgrPrd, color = cluster)) +
-  stat_ellipse(data = BS_fitness%>% filter(cluster != 0), aes(x = WtrQlt, y = AgrPrd, group = cluster, color = cluster)) +
+  geom_point(data = BS_fitness, aes(x = HabCnt, y = HabQlt, color = cluster)) +
+  stat_ellipse(data = BS_fitness%>% filter(cluster != 0), aes(x = HabCnt, y = HabQlt, group = cluster, color = cluster)) +
   scale_color_distiller(palette = "Set2") +
   # Change names labels
   labs(x = "Phorsphorus load [kg/year]",

@@ -81,8 +81,6 @@ lu_Schoeps2 <- lu_Schoeps %>%
 
 
 
-
-
 # Save number of solutions in cluster
 nsol <- data.frame(matrix(data = NA, nrow = 13, ncol = 2))
 names(nsol) <- c("Ncluster", "NBestSol")
@@ -92,7 +90,7 @@ nsol[,1] <- c(1:13)
 meas <- c("lowtillcc", "pond", "grassslope", "buffer", "hedge")
 
 
-
+n = 1
 
 # loop through all clusters
 for (n in 1:13){
@@ -279,29 +277,51 @@ for (n in 1:13){
     mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
     ggplot(aes(x = priority, y = freq, fill = nswrm)) +
     geom_violin() +
+    geom_point(aes(x = priority, y = freq),  position = position_jitter(seed = 1, width = 0.05), shape = 19, size = 2, color = "gray43", alpha = 0.30) +
     #scale_fill_qualitativex(palette="Pastel 1") +
     scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
     #scale_fill_manual(values = c("#AF58BA", "#FFC61E", "#009ADE","#F28522", "#FF1F5B"))+
     stat_summary(fun.y=mean, geom="point", shape=20, size=4, color="black", fill="black") +
     #stat_summary(fun.y=mean, geom="text", vjust=-0.7) +
-    geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2), y = freq_mean + 3)) +
-    theme(legend.position="none", text=element_text(size=20)) +
-    labs(x = "AEP typologies",
-         y = "Frequency of implementation (%)") + 
+    geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 1), y = freq_mean + 0.5), size = 8, nudge_x = 0.20) +
+    theme(legend.position="none", 
+          text=element_text(size = 30)) +
+    labs(y = "Frequency of implementation (%)") +
     # change labels name
-    scale_x_discrete(labels = c("A" = "Retention pond
-[n = 9]", "B" = "Hedgerows
-[n = 51]", "C" = "Riparian buffers
-[n = 42]", "D" = "Grassed waterways
-[n = 70]", "E" = "Reduced tillage 
-and cover crops
-[n = 632]"))
-
+    scale_x_discrete() 
+  
+ 
+#   # Poster
+#   Impl_AEP_bind%>%
+#     group_by(nswrm) %>%
+#     mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
+#     ggplot(aes(x = priority, y = freq, fill = nswrm)) +
+#     geom_violin() +
+#     #scale_fill_qualitativex(palette="Pastel 1") +
+#     scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
+#     #scale_fill_manual(values = c("#AF58BA", "#FFC61E", "#009ADE","#F28522", "#FF1F5B"))+
+#     stat_summary(fun.y=mean, geom="point", shape=20, size=4, color="black", fill="black") +
+#     #stat_summary(fun.y=mean, geom="text", vjust=-0.7) +
+#     geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 0), y = freq_mean + 3), nudge_x = 0.3, size =10) +
+#     theme(legend.position="none", text=element_text(size=36)) +
+#     labs(x = "AEP typologies",
+#          y = "Frequency of impl. (%)") + 
+#     # change labels name
+#     scale_x_discrete(labels = c("A" = "Retention pond
+# [n = 9]", "B" = "Hedgerows
+# [n = 28]", "C" = "Riparian buffers
+# [n = 34]", "D" = "Grassed waterways
+# [n = 30]", "E" = "Reduced tillage 
+# and cover crops
+# [n = 201]"))
+#   
+  
   # Save plot
-  ggsave(file = paste0("Frequency_violinplot_cl_", n, "1608.png"),
-         width = 297, height = 210, units = "mm")
-
-
+  ggsave(file = paste0("Frequency_violinplot_cl_", n, "_1112_jitter.png"),
+          width = 297, height = 190, units = "mm")
+  
+}
+  
 
 
 
@@ -401,8 +421,8 @@ and cover crops
 [n = 632]"))
 
   # Save plot
-  ggsave(file = paste0("Frequency_violinplot_cl_", n, "areapoint_jitter_1608.png"),
-          width = 297, height = 210, units = "mm")
+  # ggsave(file = paste0("Frequency_violinplot_cl_", n, "areapoint_jitter_1608.png"),
+  #         width = 297, height = 210, units = "mm")
   
   
   
@@ -415,7 +435,7 @@ and cover crops
   
   
   # grouped violin plot
-  vplot3 <- areaweight %>%
+  vplot3_cl9 <- areaweight %>%
     group_by(nswrm) %>%
     mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
     mutate(freq_mean2 = mean(freq_area, na.rm = TRUE)) %>%
@@ -425,11 +445,10 @@ and cover crops
     scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
     stat_summary(aes(y = freq), fun.y = mean, geom="point", shape=20, size=4, color="black", fill="black") +
     stat_summary(aes(y = freq_area), fun.y = mean, geom="point", shape=20, size=4, color="gray47", fill="gray47") +
-    geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), nudge_x = 0.2) +
-    geom_text(data = Mean_freq2, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), color = "gray47", nudge_x = 0.2) +
-    theme(legend.position="none", text=element_text(size=20)) +
+    geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), nudge_x = 0.3, size = 6) +
+    geom_text(data = Mean_freq2, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), color = "gray47", nudge_x = 0.3, size = 6) +
     labs(x = "AEP typologies",
-         y = "Frequency of implementation (%)") + 
+         y = "Frequency of impl. (%)") + 
     # change labels name
     scale_x_discrete(labels = c("A" = "Retention pond
 [n = 9]", "B" = "Hedgerows
@@ -437,11 +456,17 @@ and cover crops
 [n = 42]", "D" = "Grassed waterways
 [n = 70]", "E" = "Reduced tillage 
 and cover crops
-[n = 632]"))
+[n = 632]")) +
+    theme(legend.position = "bottom",  
+          text=element_text(size=26),
+          axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
   
   # Save plot
-  ggsave(file = paste0("Frequency_violinplot_cl_", n, "areaweight_1608.png"),
-         width = 297, height = 210, units = "mm")
+  # ggsave(file = paste0("Frequency_violinplot_cl_", n, "areaweight_1608.png"),
+  #         width = 297, height = 210, units = "mm")
+  
+  ggsave(file = paste0("Frequency_violinplot_cl_7_areaweight_poster_legend.png"),
+         width = 180, height = 160, units = "mm")
 
   
   
@@ -481,6 +506,43 @@ and cover crops
 
 
 
+####### Win-win solutions ########
+BS_genome_cl <- BS_genome_join %>%
+  filter(AgrPrd >= 59083.86 & WtrQlt >= -6038.0 & HabCnt >= 0.00161 & HabQlt >= 0.0508)
+
+# run loop before
+
+# plot
+Impl_AEP_bind%>%
+  group_by(nswrm) %>%
+  mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
+  ggplot(aes(x = priority, y = freq, fill = nswrm)) +
+  geom_violin() +
+  #scale_fill_qualitativex(palette="Pastel 1") +
+  scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
+  #scale_fill_manual(values = c("#AF58BA", "#FFC61E", "#009ADE","#F28522", "#FF1F5B"))+
+  stat_summary(fun.y=mean, geom="point", shape=20, size=4, color="black", fill="black") +
+  #stat_summary(fun.y=mean, geom="text", vjust=-0.7) +
+  geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2), y = freq_mean - 5), nudge_x = 0.0) +
+  theme(legend.position="none", 
+        text=element_text(size=20)) +
+  labs(x = "AEP typologies",
+       y = "Frequency of implementation (%)") + 
+  # change labels name
+  scale_x_discrete(labels = c("A" = "Retention pond
+[n = 9]", "B" = "Hedgerows
+[n = 28]", "C" = "Riparian buffers
+[n = 34]", "D" = "Grassed waterways
+[n = 30]", "E" = "Reduced tillage 
+and cover crops
+[n = 201]"))
+
+# Save plot
+ggsave(file = paste0("Frequency_violinplot_winwin_0209.png"),
+       width = 297, height = 210, units = "mm")
+
+
+
 
 
 
@@ -508,7 +570,57 @@ BS_fitness_sub <- BS_fitness_conn %>%
   ))
 
 
-# x <- replace_na(BS_fitness_sub$cluster, 2)
+
+
+# 2 clusters only
+# Create 6 clusters - 3 low connectivity, 3 hig connectivity
+BS_fitness_sub <- BS_genome_join
+BS_fitness_sub$cluster <- 2
+
+BS_fitness_sub <- BS_fitness_sub %>%
+  mutate(cluster = case_when(
+    
+    (HabQlt < 0.052 & HabCnt < 0.00168) ~ 1,
+    (HabQlt >= 0.052 & HabQlt < 0.0525 & HabCnt < 0.00170) ~ 1,
+    (HabQlt >= 0.0525 & HabQlt < 0.053 & HabCnt < 0.001725) ~ 1,
+    (HabQlt >= 0.053 & HabQlt < 0.0535 & HabCnt < 0.00174) ~ 1,
+    (HabQlt >= 0.0535 & HabQlt < 0.054 & HabCnt < 0.001752) ~ 1,
+    (HabQlt >= 0.0542 & HabCnt < 0.0018) ~ 1,
+  ))
+    
+BS_fitness_sub$cluster[is.na(BS_fitness_sub$cluster)] <- 2
+
+
+
+# Create 6 clusters - 3 low connectivity, 3 hig connectivity
+BS_fitness_sub <- BS_genome_join
+
+BS_fitness_sub <- BS_fitness_sub %>%
+  filter(AgrPrd >= 58900)
+
+BS_fitness_sub <- BS_fitness_sub %>%
+      mutate(cluster = case_when(
+        
+        (HabQlt >= 0.051 & HabQlt < 0.052 & HabCnt < 0.00168) ~ 1,
+        (HabQlt >= 0.051 & HabQlt < 0.052 & HabCnt > 0.00168) ~ 2,
+        
+        (HabQlt >= 0.052 & HabQlt < 0.0525 & HabCnt < 0.00170) ~ 1,
+        (HabQlt >= 0.0525 & HabQlt < 0.053 & HabCnt < 0.001725) ~ 1,
+        (HabQlt >= 0.052 & HabQlt < 0.0525 & HabCnt > 0.00170) ~ 2,
+        (HabQlt >= 0.0525 & HabQlt < 0.053 & HabCnt > 0.001725) ~ 2,
+        
+        (HabQlt >= 0.053 & HabQlt < 0.0535 & HabCnt < 0.00174) ~ 1,
+        (HabQlt >= 0.0535 & HabQlt < 0.054 & HabCnt < 0.001752) ~ 1,
+        (HabQlt >= 0.053 & HabQlt < 0.0535 & HabCnt > 0.00174) ~ 2,
+        (HabQlt >= 0.0535 & HabQlt < 0.054 & HabCnt > 0.001752) ~ 2,
+        
+        (HabQlt >= 0.0542 & HabCnt < 0.0018) ~ 1,
+        (HabQlt >= 0.054 & HabCnt > 0.0018) ~ 2
+      ))
+    
+    
+    
+  # x <- replace_na(BS_fitness_sub$cluster, 2)
 # BS_fitness_sub$cluster <- x
 # 
 # 
@@ -522,14 +634,26 @@ ggplot() +
   #geom_vline(xintercept = 0.00161, color = "gray50") +
   #geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
   #              ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = AgrPrd, color = cluster)) +
-  stat_ellipse(data = BS_fitness_sub%>% filter(cluster != 0), aes(x = HabCnt, y = AgrPrd, color = cluster)) +
+  geom_point(data = BS_genome_join, aes(x = HabCnt, y = HabQlt), color = "grey", size = 2) +
+  geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = HabQlt, color = cluster), size = 2) +
+  #stat_ellipse(data = BS_fitness_sub %>% filter(cluster != 0), aes(x = HabCnt, y = HabQlt, color = cluster)) +
   scale_color_distiller(palette = "Set2") +
   #geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = AgrPrd), color = "red") +
   # Change names labels
   labs(x = "Probability of connectivity",
-       y = "Crop yield [grain unit]") + 
-  theme(text=element_text(size=18), legend.position = "none")
+       y = "Habitat quality") + 
+  theme(text=element_text(size=26), 
+        legend.position = 'none') #change text size
+        # legend.position = c(0.8,0.25),#change legend position
+        #legend.title = element_text(size=18), #change legend title font size
+        #legend.text = element_text(size=17)) #change legend text font size
+
+
+
+# Save plot
+ggsave(file = paste0("plot_highHbtCnt_HabQlt.png"),
+       width = 210, height = 210, units = "mm")
+
 
 
 
@@ -541,10 +665,11 @@ ggplot() +
 # table[,2] <- lu_Schoeps_AEP_freq$nswrm
 
 
+n <- 2
 
 
 # loop through all clusters
-for (n in 1:6){
+for (n in 1:2){
   
   BS_genome_cl <- BS_fitness_sub %>%
     filter(cluster == n) 
@@ -742,7 +867,7 @@ and cover crops"))
   
   
   # Save plot
-  ggsave(file = paste0("Frequency_violinplot_conn_sub", n, "_0708.png"),
+  ggsave(file = paste0("Frequency_violinplot_conn_sub", n, "_1009_new.png"),
           width = 297, height = 210, units = "mm")
   
   
@@ -759,37 +884,37 @@ and cover crops"))
   
   # All measures
   # Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
-  # lu_Schoeps_AEP_freq_group <- lu_Schoeps_AEP_freq %>%
-  #   group_by(name_new) %>%
-  #   summarize(freq2 = sum(freq))
+  lu_Schoeps_AEP_freq_group <- lu_Schoeps_AEP_freq %>%
+    group_by(name_new) %>%
+    summarize(freq2 = sum(freq))
   
   # Write shp
-  # z <- file.path(file = paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_biod_", n, ".shp"))
-  # write_sf(lu_Schoeps_AEP_freq_group, z)
+  z <- file.path(file = paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_biod_", n, "0510.shp"))
+   write_sf(lu_Schoeps_AEP_freq_group, z)
   
   
   # Loop through the measure typologies
   for (m in meas){
-    
+
     # Filter measure
     lu_Schoeps_AEP_freq_meas <- lu_Schoeps_AEP_freq %>%
       filter(nswrm == m)
-    
+
     # Summarize frequency for polygon (based on same hru) to not have overlapping polygons in the map
     lu_Schoeps_AEP_freq_meas_group <- lu_Schoeps_AEP_freq_meas %>%
       group_by(name_new) %>%
       summarize(freq2 = sum(freq))
-    
+
     # Write shp
-    z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_0708/habcnt_freq_map_", m, "cluster_", n, "_0708.shp"))
-    write_sf(lu_Schoeps_AEP_freq_meas_group, z)
-    
+    #z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_0708/habcnt_freq_map_", m, "cluster_", n, "_1009_new.shp"))
+    #write_sf(lu_Schoeps_AEP_freq_meas_group, z)
+
     # Create buffer around polygon
     meas_buffer <- lu_Schoeps_AEP_freq_meas_group %>%
       st_buffer(35.00)
-    
+
     # Write shp buffer
-    z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_0708/habcnt_freq_map_", m, "_buffer_cluster_", n, "_0708.shp"))
+    z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_biod_", m, "_buffer_cluster_", n, "_0510.shp"))
     write_sf(meas_buffer, z)
   }
 }
@@ -797,5 +922,23 @@ and cover crops"))
 
 # z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/table.csv")
 # write.csv(table, z)
+
+
+
+freq_cl1 <- Impl_AEP_bind %>%
+  select("nswrm", "name_new", "freq")
+freq_cl1$id <- paste(freq_cl1$nswrm, freq_cl1$name_new, sep = "_")
+
+freq_cl2 <- Impl_AEP_bind %>%
+  select("nswrm", "name_new", "freq")
+freq_cl2$id <- paste(freq_cl2$nswrm, freq_cl2$name_new, sep = "_")
+
+
+freq_join <- freq_cl1 %>%
+  left_join(freq_cl2, by = "id")
+
+
+z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_HabCnt.csv")
+write.csv(freq_join, z)
 
 

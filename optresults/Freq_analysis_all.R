@@ -15,13 +15,14 @@ library(sf)
 library(patchwork)
 library(plotly)
 library(tmap)
-
+library(units) # for drop units
 
 
 ## Set working directories
 # Working directory for land use map
 setwd("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis")
 path = paste(getwd(),'CoMOLA_results_june2024/Baseline', sep="/")
+#path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fert', sep="/")
 path_input = paste(getwd(),'DATA/input', sep="/")
 
 
@@ -33,6 +34,7 @@ BS_fitness <- read.csv(paste0(path,'/BS_fitness.csv'), h = F, as.is=T, sep = ";"
 names(BS_fitness) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
 # Add id column for join
 BS_fitness$X <- c(1:1070)
+#BS_fitness$X <- c(1:1246)
 
 
 # Genome Best Solutions
@@ -41,6 +43,8 @@ BS_genome <- read.csv(paste0(path,'/BS_genomes.csv'), h = F, as.is=T, sep = ";")
  # Add id column
 BS_genome <- BS_genome %>%
    mutate(id = c(1:302), .before = V1)
+
+
 # # Invert rows and columns
 # BS_genome <- data.frame(t(BS_genome[-1]))
 # # Add id
@@ -49,6 +53,14 @@ BS_genome <- BS_genome %>%
 # # Join with fitness values
 # BS_genome_join <- BS_fitness %>%
 #   left_join(BS_genome, by = "X")
+# 
+# genome_x <- BS_genome_join[434,]
+# genome_x <- genome_x[,6:307]
+# genome_x <- t(genome_x)
+# 
+# write.csv(genome_x, "Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/CoMOLA_results_june2024/WtrQlt_best_genome.csv")
+
+
 
 
 
@@ -232,8 +244,6 @@ Impl_AEP_bind <- Impl_AEP_singlemeas %>%
 
 
 
-
-
 # Frequency analysis
 # Number of times a measures is implemented across the Best solutions
 Impl_AEP_bind$count <- apply(Impl_AEP_bind[7:1076], 1, 
@@ -250,6 +260,11 @@ z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output", 
 write_csv(Impl_AEP_bind, z)
 
 
+# Group the polygons of the same AEP
+Impl_AEP_type <- Impl_AEP_bind %>%
+  group_by(name, nswrm) %>%
+  summarise(freq_2 = mean(freq, na.rm = TRUE))
+
 
 # Plot frequency of implementation divided per AEP typology
 # Calculate mean of frequency implementation for AEP typology
@@ -264,25 +279,186 @@ vplot <- Impl_AEP_bind%>%
   mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
   ggplot(aes(x = priority, y = freq, fill = nswrm)) +
   geom_violin() +
+  #geom_boxplot(width = 0.04, color="darkgrey", alpha = 0.5) +
+  geom_point(aes(x = priority, y = freq),  position = position_jitter(seed = 1, width = 0.05), shape = 19, size = 2, color = "gray43", alpha = 0.30) +
   #scale_fill_brewer(palette="Mint") +
   #scale_fill_manual(values = c("#46AEA0", "#7CCBA2", "#089099","#B7E6A5", "#00718B"))+
   scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
   #scale_fill_manual(values = c("#AF58BA", "#FFC61E", "#009ADE","#F28522", "#FF1F5B"))+
   stat_summary(fun.y=mean, geom="point", shape=20, size=4, color="black", fill="black") +
   #stat_summary(fun.y=mean, geom="text", vjust=-0.7) +
+  geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 1), y = freq_mean + 0.5), size = 5, nudge_x = 0.20) +
+  theme(legend.position="none", text=element_text(size=20)) +
+  labs(x = "Agri-Environmental Practices",
+       y = "Frequency of implementation (%)") + 
+  # change labels name
+  # change labels name
+  scale_x_discrete(labels = c("A" = "Retention
+ponds
+[n = 9]", "B" = "Hedgerows
+[n = 28]", "C" = "Riparian
+buffers
+[n = 34]", "D" = "Grassed 
+waterways
+[n = 30]", "E" = "Reduced 
+tillage and
+cover crops
+[n = 201]"))
+
+vplot
+
+
+
+# Save plot
+ggsave(file = "Frequency_violinplot_all_1112_jitter.png",
+          width = 297, height = 170, units = "mm")
+
+
+
+
+# Join 
+Impl_AEP_bind_sel <- Impl_AEP_bind %>%
+  select(c("nswrm", "name_new", "count", "freq"))
+
+lu_Schoeps_AEP_freq <- lu_Schoeps2 %>%
+  left_join(Impl_AEP_bind_sel, by = "name_new")
+
+
+# Area weighted frequency of implementation
+lu_Schoeps_AEP_freq <- lu_Schoeps_AEP_freq %>%
+  mutate(area_m = st_area(lu_Schoeps_AEP_freq), .after = name_new) %>%
+  mutate(area = drop_units(area_m), .after = area_m)
+
+
+# Group the polygons of the same AEP
+lu_Schoeps_AEP_freq <- lu_Schoeps_AEP_freq %>%
+  group_by(name, nswrm) %>%
+  summarise(area = sum(area, na.rm = TRUE))
+
+
+# pond
+lu_Schoeps_AEP_freq_pond <- lu_Schoeps_AEP_freq %>%
+  filter(nswrm == "pond") %>%
+  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
+  mutate(freq_area = freq * area_norm) %>%
+  mutate(priority = "A")
+
+# hedge
+lu_Schoeps_AEP_freq_hedge <- lu_Schoeps_AEP_freq %>%
+  filter(nswrm == "hedge") %>%
+  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
+  mutate(freq_area = freq * area_norm) %>%
+  mutate(priority = "B")
+
+areaweight <- lu_Schoeps_AEP_freq_pond %>%
+  bind_rows(lu_Schoeps_AEP_freq_hedge)
+
+# buffer
+lu_Schoeps_AEP_freq_buffer <- lu_Schoeps_AEP_freq %>%
+  filter(nswrm == "buffer") %>%
+  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
+  mutate(freq_area = freq * area_norm) %>%
+  mutate(priority = "C")
+
+areaweight <- areaweight %>%
+  bind_rows(lu_Schoeps_AEP_freq_buffer)
+
+# grassslope
+lu_Schoeps_AEP_freq_grassslope <- lu_Schoeps_AEP_freq %>%
+  filter(nswrm == "grassslope") %>%
+  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
+  mutate(freq_area = freq * area_norm)%>%
+  mutate(priority = "D") 
+
+areaweight <- areaweight %>%
+  bind_rows(lu_Schoeps_AEP_freq_grassslope)
+
+# lowtillcc
+lu_Schoeps_AEP_freq_lowtillcc <- lu_Schoeps_AEP_freq %>%
+  filter(nswrm == "lowtillcc") %>%
+  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
+  mutate(freq_area = freq * area_norm)%>%
+  mutate(priority = "E") 
+
+areaweight <- areaweight %>%
+  bind_rows(lu_Schoeps_AEP_freq_lowtillcc)
+
+
+
+
+# Plot frequency of implementation divided per AEP typology
+# Calculate mean of frequency implementation for AEP typology
+# Mean_freq2 <- areaweight %>%
+#   group_by(nswrm) %>%
+#   summarise(freq_mean = mean(freq_area, na.rm = TRUE)) %>%
+#   mutate(priority = c("C","D","B","E","A"))
+
+
+# grouped violin plot
+vplot2 <- Impl_AEP_bind %>%
+  group_by(nswrm) %>%
+  mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
+  ggplot(aes(x = priority, y = freq, fill = nswrm)) +
+  geom_violin() +
+  geom_point(data = areaweight, aes(x = priority, y = freq, size = area_norm),  position = position_jitter(seed = 1, width = 0.2), shape = 19, color = "darkgrey", alpha = 0.25) +
+  scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
+  stat_summary(fun.y = mean, geom="point", shape=20, size=4, color="black", fill="black") +
   geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2), y = freq_mean + 3)) +
   theme(legend.position="none", text=element_text(size=20)) +
   labs(x = "AEP typologies",
        y = "Frequency of implementation (%)") + 
   # change labels name
-  scale_x_discrete(labels = c("A" = "Retention pond", "B" = "Hedgerows ", "C" = "Riparian buffers ", "D" = "Grassed waterways ", "E" = "Reduced tillage
-and cover crops"))
-
+  scale_x_discrete(labels = c("A" = "Retention pond
+[n = 9]", "B" = "Hedgerows
+[n = 51]", "C" = "Riparian buffers
+[n = 42]", "D" = "Grassed waterways
+[n = 70]", "E" = "Reduced tillage 
+and cover crops
+[n = 632]"))
 
 # Save plot
-ggsave(file = "Frequency_violinplot_all_0708.png",
-         width = 297, height = 210, units = "mm")
+# ggsave(file = paste0("Frequency_violinplot_cl_", n, "areapoint_jitter_1608.png"),
+#         width = 297, height = 210, units = "mm")
 
+
+
+# Plot frequency of implementation divided per AEP typology
+# Calculate mean of frequency implementation for AEP typology
+Mean_freq2 <- areaweight %>%
+  group_by(nswrm) %>%
+  summarise(freq_mean = mean(freq_area, na.rm = TRUE)) %>%
+  mutate(priority = c("C","D","B","E","A"))
+
+
+# grouped violin plot
+vplot3 <- areaweight %>%
+  group_by(nswrm) %>%
+  mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
+  mutate(freq_mean2 = mean(freq_area, na.rm = TRUE)) %>%
+  ggplot(aes(x = priority)) +
+  geom_violin(aes(y = freq, fill = nswrm)) +
+  geom_violin(aes( y = freq_area), color = "grey", fill = "grey", alpha = 0.25) +
+  scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
+  stat_summary(aes(y = freq), fun.y = mean, geom="point", shape=20, size=4, color="black", fill="black") +
+  stat_summary(aes(y = freq_area), fun.y = mean, geom="point", shape=20, size=4, color="gray47", fill="gray47") +
+  geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), nudge_x = 0.2) +
+  geom_text(data = Mean_freq2, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), color = "gray47", nudge_x = 0.2) +
+  labs(x = "AEP typologies",
+       y = "Frequency of implementation (%)") + 
+  theme(legend.position = "none",  
+        text=element_text(size=20)) +
+  # change labels name
+  scale_x_discrete(labels = c("A" = "Retention pond
+[n = 9]", "B" = "Hedgerows
+[n = 51]", "C" = "Riparian buffers
+[n = 42]", "D" = "Grassed waterways
+[n = 70]", "E" = "Reduced tillage 
+and cover crops
+[n = 632]"))
+
+# Save plot
+ggsave(file = "Frequency_violinplot_all_areaweight.png",
+          width = 297, height = 210, units = "mm")
 
 
 
@@ -341,7 +517,28 @@ for (m in meas){
 
 
 
+###########################################################
 
+
+x <- Impl_AEP_bind[652, 9:1078]
+x_transpose <- as.data.frame(t(x))
+x_transpose$X <- c(1:1070)
+x_join <- BS_fitness %>%
+  left_join(x_transpose, by = "X")
+
+ggplot() +
+  #geom_hline(yintercept = 59083.86, color = "gray50") +
+  #geom_vline(xintercept = 0.00161, color = "gray50") +
+  #geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
+  #              ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = x_join, aes(x = HabCnt, y = AgrPrd, color = V1)) +
+  #stat_ellipse(data = BS_fitness_sub %>% filter(cluster != 0), aes(x = HabCnt, y = HabQlt, color = cluster)) +
+  scale_color_distiller(palette = "Set2") +
+  #geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = AgrPrd), color = "red") +
+  # Change names labels
+  labs(x = "Probability of connectivity",
+       y = "Crop yield [grain unit]") + 
+  theme(text=element_text(size=18), legend.position = "none")
 
 
 
