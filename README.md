@@ -15,10 +15,16 @@ In the folder "output_analysis" there are the codes used to postprocess the opti
 
 ## optresults
 The "Trade_offs_baseline" code is used to plot the four-dimensional Pareto frontier (= trade-off curve) and to analyse the trade-off between all the considered objectives, as well as for 2-dimensional Pareto-frontiers. 
+
 The "Trade_offs_HabCnt" code is used to model habitat connectivity separately for the different animal species considered. It is run using as input the Best Solution coming from the optimization (baseline scenario).
+
 The "Trade_offs_scenarios" code is used to plot together the four-dimensional Pareto frontiers of the baseline and policy-based scenarios.
+
 The "Trade_offs_barplot" code is used to plot the barplots of the range of trade-offs for the baseline and policy-based scenarios and for the each couple of objectives in the baseline scenario.
 
+
 The "Cluster-analysis" code is used to individuate clusters of solutions along the Pareto-frontier (baseline scenario)
+
 The "Freq_analysis_all" code is used to analyse the frequency of AEP implementation when considering all the Best Solutions together.
+
 The "Freq_analysis_clusters" code is used to analyse the frequency of AEP implementation for the Best Solutions beloging to each cluster.
