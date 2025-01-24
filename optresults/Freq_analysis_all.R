@@ -1,6 +1,6 @@
 ###################################################
 
-# Title: Frequency_analysis_all
+# Title: Frequency Analysis - all solutions
 # Purpose: This code is used to analyse the frequency of AEP implementation when considering all the Best Solutions together
 # Reference: 
 # Author: Marta Bonato 
