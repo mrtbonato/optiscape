@@ -4,7 +4,7 @@
 # Purpose: This code is used to analyse the frequency of AEP implementation when considering all the Best Solutions together
 # Reference: 
 # Author: Marta Bonato 
-# Date: last modified on 09 July 2024
+# Date: last modified on 24 January 2024
 
 ###################################################
 
@@ -18,8 +18,7 @@ library(tmap)
 library(units) # for drop units
 
 
-## Set working directories
-# Working directory for land use map
+##  Set working directories
 setwd("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis")
 path = paste(getwd(),'CoMOLA_results_june2024/Baseline', sep="/")
 #path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fert', sep="/")
@@ -27,17 +26,17 @@ path_input = paste(getwd(),'DATA/input', sep="/")
 
 
 
-# Fitness Best Solutions
-## Upload fitness of Best solutions
+## Fitness Best Solutions
+# Upload fitness of Best solutions
 BS_fitness <- read.csv(paste0(path,'/BS_fitness.csv'), h = F, as.is=T, sep = ";")
-## Rename columns
+# Rename columns
 names(BS_fitness) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
 # Add id column for join
 BS_fitness$X <- c(1:1070)
 #BS_fitness$X <- c(1:1246)
 
 
-# Genome Best Solutions
+## Genome Best Solutions
 # Upload genome of Best solutions 
 BS_genome <- read.csv(paste0(path,'/BS_genomes.csv'), h = F, as.is=T, sep = ";")
  # Add id column
@@ -45,26 +44,9 @@ BS_genome <- BS_genome %>%
    mutate(id = c(1:302), .before = V1)
 
 
-# # Invert rows and columns
-# BS_genome <- data.frame(t(BS_genome[-1]))
-# # Add id
-# BS_genome <- BS_genome %>%
-#   mutate(X = c(1:1070), .before = X1)
-# # Join with fitness values
-# BS_genome_join <- BS_fitness %>%
-#   left_join(BS_genome, by = "X")
-# 
-# genome_x <- BS_genome_join[434,]
-# genome_x <- genome_x[,6:307]
-# genome_x <- t(genome_x)
-# 
-# write.csv(genome_x, "Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/CoMOLA_results_june2024/WtrQlt_best_genome.csv")
 
 
-
-
-
-### MODIFY GENOME TABLE BASED ON PRIORITY OF IMPEMENTATION OF AEP
+### MODIFY GENOME TABLE BASED ON PRIORITY OF IMPEMENTATION OF AEP ##############
 # becauSe 2 or more AEP cannot be implemented at the same time in the same hru
 
 # Associate Best Solutions to genome hru 
@@ -94,21 +76,9 @@ lu_Schoeps2 <- lu_Schoeps %>%
 
 
 
-# Modify genome based on priorities
-## Select genome
-# BS_genome_2 <- BS_genome_join %>%
-#   select(c(6:length(BS_genome_join)))
-# 
-# # Invert rows and columns
-# BS_genome_2 <- data.frame(t(BS_genome_2))
-# 
-# # Add id column
-# BS_genome_2 <- BS_genome_2 %>%
-#   mutate(id = c(1:302), .before = X1)
-
-
 # Join Best Solution to genome 
-##### When analyzing the subsets chose here the subset of Best_Sol2_2 to analyse and to join with genome_hru_separate ####
+### When analyzing the subsets 
+## chose here the subset of Best_Sol2_2 to analyse and to join with genome_hru_separate ####
 Impl_AEP <- genome_hru_separate %>%
   left_join(BS_genome, by = "id") 
 
@@ -185,7 +155,7 @@ Impl_AEP_singlemeas <-  x %>%
 
 
 ## Modify genome based on priorities
-n_genomes = 1070  # equal to no. best solutions
+n_genomes = 1070                                    # equal to no. best solutions
 
 # 3 measures implementable
 Impl_AEP_3meas_copy <- Impl_AEP_3meas
@@ -244,20 +214,22 @@ Impl_AEP_bind <- Impl_AEP_singlemeas %>%
 
 
 
-# Frequency analysis
+
+
+### FREQUENCY ANALYSIS #########################################################
 # Number of times a measures is implemented across the Best solutions
 Impl_AEP_bind$count <- apply(Impl_AEP_bind[7:1076], 1, 
-                             function(x) length(which(x =="2")))
+                             function(x) length(which(x =="2")))   # based on no. best solutions
 
 # Calculate frequency
 Impl_AEP_bind <- Impl_AEP_bind%>%
   relocate(count, .after = name_new) %>%
-  mutate(freq = (count / 1070)*100, .after = count)
+  mutate(freq = (count / 1070) * 100, .after = count)          # equal to no. best solutions
 
 
 # write csv file
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output", "Impl_AEP_bind_0608.csv")
-write_csv(Impl_AEP_bind, z)
+# z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output", "Impl_AEP_bind_0608.csv")
+# write_csv(Impl_AEP_bind, z)
 
 
 # Group the polygons of the same AEP
@@ -272,6 +244,7 @@ Mean_freq <- Impl_AEP_bind %>%
   group_by(nswrm) %>%
   summarise(freq_mean = mean(freq, na.rm = TRUE)) %>%
   mutate(priority = c("C","D","B","E","A"))
+
 
 # grouped violin plot
 vplot <- Impl_AEP_bind%>%
@@ -316,160 +289,13 @@ ggsave(file = "Frequency_violinplot_all_1112_jitter.png",
 
 
 
-# Join 
-Impl_AEP_bind_sel <- Impl_AEP_bind %>%
-  select(c("nswrm", "name_new", "count", "freq"))
 
-lu_Schoeps_AEP_freq <- lu_Schoeps2 %>%
-  left_join(Impl_AEP_bind_sel, by = "name_new")
-
-
-# Area weighted frequency of implementation
-lu_Schoeps_AEP_freq <- lu_Schoeps_AEP_freq %>%
-  mutate(area_m = st_area(lu_Schoeps_AEP_freq), .after = name_new) %>%
-  mutate(area = drop_units(area_m), .after = area_m)
-
-
-# Group the polygons of the same AEP
-lu_Schoeps_AEP_freq <- lu_Schoeps_AEP_freq %>%
-  group_by(name, nswrm) %>%
-  summarise(area = sum(area, na.rm = TRUE))
-
-
-# pond
-lu_Schoeps_AEP_freq_pond <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "pond") %>%
-  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
-  mutate(freq_area = freq * area_norm) %>%
-  mutate(priority = "A")
-
-# hedge
-lu_Schoeps_AEP_freq_hedge <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "hedge") %>%
-  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
-  mutate(freq_area = freq * area_norm) %>%
-  mutate(priority = "B")
-
-areaweight <- lu_Schoeps_AEP_freq_pond %>%
-  bind_rows(lu_Schoeps_AEP_freq_hedge)
-
-# buffer
-lu_Schoeps_AEP_freq_buffer <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "buffer") %>%
-  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
-  mutate(freq_area = freq * area_norm) %>%
-  mutate(priority = "C")
-
-areaweight <- areaweight %>%
-  bind_rows(lu_Schoeps_AEP_freq_buffer)
-
-# grassslope
-lu_Schoeps_AEP_freq_grassslope <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "grassslope") %>%
-  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
-  mutate(freq_area = freq * area_norm)%>%
-  mutate(priority = "D") 
-
-areaweight <- areaweight %>%
-  bind_rows(lu_Schoeps_AEP_freq_grassslope)
-
-# lowtillcc
-lu_Schoeps_AEP_freq_lowtillcc <- lu_Schoeps_AEP_freq %>%
-  filter(nswrm == "lowtillcc") %>%
-  mutate(area_norm = ((area - 0)/(max(area) - 0)), .after = area) %>%
-  mutate(freq_area = freq * area_norm)%>%
-  mutate(priority = "E") 
-
-areaweight <- areaweight %>%
-  bind_rows(lu_Schoeps_AEP_freq_lowtillcc)
-
-
-
-
-# Plot frequency of implementation divided per AEP typology
-# Calculate mean of frequency implementation for AEP typology
-# Mean_freq2 <- areaweight %>%
-#   group_by(nswrm) %>%
-#   summarise(freq_mean = mean(freq_area, na.rm = TRUE)) %>%
-#   mutate(priority = c("C","D","B","E","A"))
-
-
-# grouped violin plot
-vplot2 <- Impl_AEP_bind %>%
-  group_by(nswrm) %>%
-  mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
-  ggplot(aes(x = priority, y = freq, fill = nswrm)) +
-  geom_violin() +
-  geom_point(data = areaweight, aes(x = priority, y = freq, size = area_norm),  position = position_jitter(seed = 1, width = 0.2), shape = 19, color = "darkgrey", alpha = 0.25) +
-  scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
-  stat_summary(fun.y = mean, geom="point", shape=20, size=4, color="black", fill="black") +
-  geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2), y = freq_mean + 3)) +
-  theme(legend.position="none", text=element_text(size=20)) +
-  labs(x = "AEP typologies",
-       y = "Frequency of implementation (%)") + 
-  # change labels name
-  scale_x_discrete(labels = c("A" = "Retention pond
-[n = 9]", "B" = "Hedgerows
-[n = 51]", "C" = "Riparian buffers
-[n = 42]", "D" = "Grassed waterways
-[n = 70]", "E" = "Reduced tillage 
-and cover crops
-[n = 632]"))
-
-# Save plot
-# ggsave(file = paste0("Frequency_violinplot_cl_", n, "areapoint_jitter_1608.png"),
-#         width = 297, height = 210, units = "mm")
-
-
-
-# Plot frequency of implementation divided per AEP typology
-# Calculate mean of frequency implementation for AEP typology
-Mean_freq2 <- areaweight %>%
-  group_by(nswrm) %>%
-  summarise(freq_mean = mean(freq_area, na.rm = TRUE)) %>%
-  mutate(priority = c("C","D","B","E","A"))
-
-
-# grouped violin plot
-vplot3 <- areaweight %>%
-  group_by(nswrm) %>%
-  mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
-  mutate(freq_mean2 = mean(freq_area, na.rm = TRUE)) %>%
-  ggplot(aes(x = priority)) +
-  geom_violin(aes(y = freq, fill = nswrm)) +
-  geom_violin(aes( y = freq_area), color = "grey", fill = "grey", alpha = 0.25) +
-  scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
-  stat_summary(aes(y = freq), fun.y = mean, geom="point", shape=20, size=4, color="black", fill="black") +
-  stat_summary(aes(y = freq_area), fun.y = mean, geom="point", shape=20, size=4, color="gray47", fill="gray47") +
-  geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), nudge_x = 0.2) +
-  geom_text(data = Mean_freq2, aes(label = round(freq_mean, digits = 2),  y = freq_mean + 1), color = "gray47", nudge_x = 0.2) +
-  labs(x = "AEP typologies",
-       y = "Frequency of implementation (%)") + 
-  theme(legend.position = "none",  
-        text=element_text(size=20)) +
-  # change labels name
-  scale_x_discrete(labels = c("A" = "Retention pond
-[n = 9]", "B" = "Hedgerows
-[n = 51]", "C" = "Riparian buffers
-[n = 42]", "D" = "Grassed waterways
-[n = 70]", "E" = "Reduced tillage 
-and cover crops
-[n = 632]"))
-
-# Save plot
-ggsave(file = "Frequency_violinplot_all_areaweight.png",
-          width = 297, height = 210, units = "mm")
-
-
-
-###  FREQUENCY MAPS
+###  FREQUENCY MAPS  ##########################################################
 # Show the frequence with which an AEP is implemented in every polygons
 
 # Join 
 lu_Schoeps_AEP_freq <- lu_Schoeps2 %>%
   left_join(Impl_AEP_bind, select(c(nswrm, count, freq)), by = "name_new")
-
-
 
 
 # All measures together
@@ -479,8 +305,8 @@ lu_Schoeps_AEP_freq_group <- lu_Schoeps_AEP_freq %>%
   summarize(freq2 = sum(freq))
 
 # Write shp
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_all_0608.shp")
-write_sf(lu_Schoeps_AEP_freq_group, z)
+# z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_all_0608.shp")
+# write_sf(lu_Schoeps_AEP_freq_group, z)
 
 
 
@@ -512,36 +338,5 @@ for (m in meas){
   z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_", m, "_buffer_0608.shp"))
   write_sf(meas_buffer, z)
 }
-
-
-
-
-
-###########################################################
-
-
-x <- Impl_AEP_bind[652, 9:1078]
-x_transpose <- as.data.frame(t(x))
-x_transpose$X <- c(1:1070)
-x_join <- BS_fitness %>%
-  left_join(x_transpose, by = "X")
-
-ggplot() +
-  #geom_hline(yintercept = 59083.86, color = "gray50") +
-  #geom_vline(xintercept = 0.00161, color = "gray50") +
-  #geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
-  #              ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
-  geom_point(data = x_join, aes(x = HabCnt, y = AgrPrd, color = V1)) +
-  #stat_ellipse(data = BS_fitness_sub %>% filter(cluster != 0), aes(x = HabCnt, y = HabQlt, color = cluster)) +
-  scale_color_distiller(palette = "Set2") +
-  #geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = AgrPrd), color = "red") +
-  # Change names labels
-  labs(x = "Probability of connectivity",
-       y = "Crop yield [grain unit]") + 
-  theme(text=element_text(size=18), legend.position = "none")
-
-
-
-
 
 
