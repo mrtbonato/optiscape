@@ -4,7 +4,7 @@
 # Purpose: This code is used to analyse the frequency of AEP implementation when considering all the Best Solutions together
 # Reference: 
 # Author: Marta Bonato 
-# Date: last modified on 24 January 2024
+# Date: last modified on 24 January 2025
 
 ###################################################
 
@@ -21,7 +21,6 @@ library(units) # for drop units
 ##  Set working directories
 setwd("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis")
 path = paste(getwd(),'CoMOLA_results_june2024/Baseline', sep="/")
-#path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fert', sep="/")
 path_input = paste(getwd(),'DATA/input', sep="/")
 
 
@@ -291,7 +290,7 @@ ggsave(file = "Frequency_violinplot_all_1112_jitter.png",
 
 
 ###  FREQUENCY MAPS  ##########################################################
-# Show the frequence with which an AEP is implemented in every polygons
+# Show the frequency with which an AEP is implemented in every polygons
 
 # Join 
 lu_Schoeps_AEP_freq <- lu_Schoeps2 %>%
@@ -338,5 +337,8 @@ for (m in meas){
   z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_", m, "_buffer_0608.shp"))
   write_sf(meas_buffer, z)
 }
+
+
+
 
 

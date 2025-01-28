@@ -11,11 +11,6 @@ The code "model_all_fallow" is used for the scenarios with fallow lands as propo
 
 
 
-## output_analysis
-In the folder "output_analysis" there are the codes used to postprocess the optimization results (baseline and scenarios), calculating the hypervolume and retrieving the fitness values and the genome of the Best Solutions. Fitness values and genomes are used as input for all the following analyses.
-
-
-
 ## optresults
 The "Trade_offs_baseline" code is used to plot the four-dimensional Pareto frontier (= trade-off curve) and to analyse the trade-off between all the considered objectives, as well as for 2-dimensional Pareto-frontiers. 
 
@@ -30,3 +25,7 @@ The "Cluster_analysis" code is used to individuate clusters of solutions along t
 The "Freq_analysis_all" code is used to analyse the frequency of AEP implementation when considering all the Best Solutions together.
 
 The "Freq_analysis_clusters" code is used to analyse the frequency of AEP implementation for the Best Solutions beloging to each cluster.
+
+The "Freq_analysis_HabCnt" code is used to analyse the frequency of AEP implementation for 2 subsets of the Pareto-optimal solutions (low and high Habitat Connectivity values).
+
+The "Freq_analysis_fallow"  code is used to analyse the frequency of AEP implementation for the policy-based scenarios including fallow implementation.

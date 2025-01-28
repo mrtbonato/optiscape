@@ -1,79 +1,68 @@
+###################################################
+
+# Title: Frequency Analysis - Habitat Connectivity
+# Purpose: This code is used to analyse the frequency of AEP implementation for 2 subsets of the Pareto-optimal solutions (low and high Habitat Connectivity values)
+# Reference: 
+# Author: Marta Bonato 
+# Date: last modified on 28 January 2025
+
+###################################################
+
+
+## Upload required packages
+library(tidyverse)
+library(sf)
+library(patchwork)
+library(plotly)
+library(tmap)
+library(units) # for drop units
+
+
+##  Set working directories
+setwd("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis")
+path = paste(getwd(),'CoMOLA_results_june2024/Baseline', sep="/")
+path_input = paste(getwd(),'DATA/input', sep="/")
+
+
+## Fitness Best Solutions
+# Upload fitness of Best solutions
+BS_fitness <- read.csv(paste0(path,'/BS_fitness.csv'), h = F, as.is=T, sep = ";")
+# Rename columns
+names(BS_fitness) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
+# Add id column for join
+BS_fitness$X <- c(1:1070)
+#BS_fitness$X <- c(1:1246)
+
+
+## Genome Best Solutions
+# Upload genome of Best solutions 
+BS_genome <- read.csv(paste0(path,'/BS_genomes.csv'), h = F, as.is=T, sep = ";")
+# Add id column
+BS_genome <- BS_genome %>%
+  mutate(id = c(1:302), .before = V1)
+
+
+# # Invert rows and columns
+BS_genome <- data.frame(t(BS_genome[-1]))
+
+# Add id
+BS_genome <- BS_genome %>%
+  mutate(X = c(1:1070), .before = X1)
+
+# # Join with fitness values
+BS_genome_join <- BS_fitness %>%
+   left_join(BS_genome, by = "X")
 
 
 
 
 
-####### Win-win solutions ########
-BS_genome_cl <- BS_genome_join %>%
-  filter(AgrPrd >= 59083.86 & WtrQlt >= -6038.0 & HabCnt >= 0.00161 & HabQlt >= 0.0508)
-
-# run loop before
-
-# plot
-Impl_AEP_bind%>%
-  group_by(nswrm) %>%
-  mutate(freq_mean = mean(freq, na.rm = TRUE)) %>%
-  ggplot(aes(x = priority, y = freq, fill = nswrm)) +
-  geom_violin() +
-  #scale_fill_qualitativex(palette="Pastel 1") +
-  scale_fill_manual(values = c("#dbf1fd", "#daf1c5","#e5e1fb", "#fff5c5","#ceddf9"))+
-  #scale_fill_manual(values = c("#AF58BA", "#FFC61E", "#009ADE","#F28522", "#FF1F5B"))+
-  stat_summary(fun.y=mean, geom="point", shape=20, size=4, color="black", fill="black") +
-  #stat_summary(fun.y=mean, geom="text", vjust=-0.7) +
-  geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 2), y = freq_mean - 5), nudge_x = 0.0) +
-  theme(legend.position="none", 
-        text=element_text(size=20)) +
-  labs(x = "AEP typologies",
-       y = "Frequency of implementation (%)") + 
-  # change labels name
-  scale_x_discrete(labels = c("A" = "Retention pond
-[n = 9]", "B" = "Hedgerows
-[n = 28]", "C" = "Riparian buffers
-[n = 34]", "D" = "Grassed waterways
-[n = 30]", "E" = "Reduced tillage 
-and cover crops
-[n = 201]"))
-
-# Save plot
-ggsave(file = paste0("Frequency_violinplot_winwin_0209.png"),
-       width = 297, height = 210, units = "mm")
-
-
-
-
-
-
-######### Analysis HabCnt ######
-
-BS_fitness_conn <- BS_genome_join %>%
+# Select solutions over a certain value of agricultural production
+BS_fitness_sub <- BS_genome_join %>%
   filter(AgrPrd >= 58900)
 
-# Create 6 clusters - 3 low connectivity, 3 hig connectivity
-BS_fitness_sub <- BS_fitness_conn %>%
-  mutate(cluster = case_when(
-    # High AP - Low Biod
-    (AgrPrd >= 59150 & HabCnt < 0.00168) ~ 1,
-    (AgrPrd >= 59150 & HabCnt > 0.00168) ~ 2,
-    (AgrPrd >= 59100 & AgrPrd < 59150 & HabCnt < 0.001694 ) ~ 1,
-    (AgrPrd >= 59100 & AgrPrd < 59120 & HabCnt < 0.00170 ) ~ 1,
-    (AgrPrd >= 59100 & AgrPrd < 59150 & HabCnt > 0.001694 ) ~ 2,
-    
-    (AgrPrd >= 59000 & AgrPrd < 59100 &  HabCnt < 0.00172 ) ~ 3,
-    (AgrPrd >= 59000 & AgrPrd < 59050 & HabCnt < 0.001735 ) ~ 3,
-    (AgrPrd >= 59000 & AgrPrd < 59100 &  HabCnt > 0.00172 ) ~ 4,
-    
-    (AgrPrd < 59000 & HabCnt < 0.001755 ) ~ 5,
-    (AgrPrd < 59000 & AgrPrd >= 58900 & HabCnt > 0.001735 ) ~ 6
-  ))
 
-
-
-
-# 2 clusters only
-# Create 6 clusters - 3 low connectivity, 3 hig connectivity
-BS_fitness_sub <- BS_genome_join
-BS_fitness_sub$cluster <- 2
-
+# Create 2 clusters - 1 low connectivity, 1 high connectivity
 BS_fitness_sub <- BS_fitness_sub %>%
   mutate(cluster = case_when(
     
@@ -89,62 +78,30 @@ BS_fitness_sub$cluster[is.na(BS_fitness_sub$cluster)] <- 2
 
 
 
-# Create 6 clusters - 3 low connectivity, 3 hig connectivity
-BS_fitness_sub <- BS_genome_join
 
-BS_fitness_sub <- BS_fitness_sub %>%
-  filter(AgrPrd >= 58900)
-
-BS_fitness_sub <- BS_fitness_sub %>%
-  mutate(cluster = case_when(
-    
-    (HabQlt >= 0.051 & HabQlt < 0.052 & HabCnt < 0.00168) ~ 1,
-    (HabQlt >= 0.051 & HabQlt < 0.052 & HabCnt > 0.00168) ~ 2,
-    
-    (HabQlt >= 0.052 & HabQlt < 0.0525 & HabCnt < 0.00170) ~ 1,
-    (HabQlt >= 0.0525 & HabQlt < 0.053 & HabCnt < 0.001725) ~ 1,
-    (HabQlt >= 0.052 & HabQlt < 0.0525 & HabCnt > 0.00170) ~ 2,
-    (HabQlt >= 0.0525 & HabQlt < 0.053 & HabCnt > 0.001725) ~ 2,
-    
-    (HabQlt >= 0.053 & HabQlt < 0.0535 & HabCnt < 0.00174) ~ 1,
-    (HabQlt >= 0.0535 & HabQlt < 0.054 & HabCnt < 0.001752) ~ 1,
-    (HabQlt >= 0.053 & HabQlt < 0.0535 & HabCnt > 0.00174) ~ 2,
-    (HabQlt >= 0.0535 & HabQlt < 0.054 & HabCnt > 0.001752) ~ 2,
-    
-    (HabQlt >= 0.0542 & HabCnt < 0.0018) ~ 1,
-    (HabQlt >= 0.054 & HabCnt > 0.0018) ~ 2
-  ))
-
-
-
-# x <- replace_na(BS_fitness_sub$cluster, 2)
-# BS_fitness_sub$cluster <- x
-# 
-# 
-# # Check up
-# BS_fitness_sub1 <- BS_fitness_sub %>%
-#   filter(sub == 1)
-
-
+### PLOT PARETO FRONTIER ######################################################
+# for Habitat connectivity and quality
 ggplot() +
-  #geom_hline(yintercept = 59083.86, color = "gray50") +
-  #geom_vline(xintercept = 0.00161, color = "gray50") +
-  #geom_rect(aes(xmin = StatusQuo$HabCnt, xmax = Inf,
-  #              ymin = StatusQuo$AgrPrd, ymax = Inf), fill = "#21908CFF" , alpha = .2) +
+  geom_point(data = BS_genome_join, aes(x = HabCnt, y = AgrPrd), color = "grey", size = 2) +
+  geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = AgrPrd, color = cluster), size = 2) +
+  scale_color_distiller(palette = "Set2") +
+  # Change names labels
+  labs(x = "Probability of connectivity",
+       y = "Crop yield [grain unit]") + 
+  theme(text=element_text(size=26), 
+        legend.position = 'none') 
+
+
+# for Habitat connectivity and agricultural production
+ggplot() +
   geom_point(data = BS_genome_join, aes(x = HabCnt, y = HabQlt), color = "grey", size = 2) +
   geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = HabQlt, color = cluster), size = 2) +
-  #stat_ellipse(data = BS_fitness_sub %>% filter(cluster != 0), aes(x = HabCnt, y = HabQlt, color = cluster)) +
   scale_color_distiller(palette = "Set2") +
-  #geom_point(data = BS_fitness_sub, aes(x = HabCnt, y = AgrPrd), color = "red") +
-  # Change names labels
+    # Change names labels
   labs(x = "Probability of connectivity",
        y = "Habitat quality") + 
   theme(text=element_text(size=26), 
-        legend.position = 'none') #change text size
-# legend.position = c(0.8,0.25),#change legend position
-#legend.title = element_text(size=18), #change legend title font size
-#legend.text = element_text(size=17)) #change legend text font size
-
+        legend.position = 'none') 
 
 
 # Save plot
@@ -154,18 +111,13 @@ ggsave(file = paste0("plot_highHbtCnt_HabQlt.png"),
 
 
 
-# table <- data.frame(matrix(data=NA, nrow=55, ncol=8))
-# #names(table) <- c("1_id", "1_meas", "1_freq", "2_id", "2_meas", "2_freq", "3_id", "3_meas",  "3_freq", "4_id", "4_meas", "4_freq", "5_id", "5_meas",  "5_freq", "6_id", "6_meas", "6_freq" )
-# 
-# names(table) <- c("name_new", "nswrm", "1_freq", "2_freq", "3_freq", "4_freq", "5_freq", "6_freq" )
-# table[,1] <- lu_Schoeps_AEP_freq$name_new
-# table[,2] <- lu_Schoeps_AEP_freq$nswrm
+### FREQUENCY ANALYSIS AND MAPS ###############################################
+
+# Create list of measure typologies
+meas <- c("lowtillcc", "pond", "grassslope", "buffer", "hedge", "fallow")
 
 
-n <- 2
-
-
-# loop through all clusters
+# loop through clusters
 for (n in 1:2){
   
   BS_genome_cl <- BS_fitness_sub %>%
@@ -320,7 +272,7 @@ for (n in 1:2){
   
   
   
-  ### FREQUENCY ANALYSIS
+  ### FREQUENCY ANALYSIS  ######################################################
   # Number of times a measures is implemented across the Best solutions
   Impl_AEP_bind$count <- apply(Impl_AEP_bind[7:(6 + nrows)], 1, 
                                function(x) length(which(x =="2")))
@@ -371,7 +323,7 @@ and cover crops"))
   
   
   
-  ###  FREQUENCY MAPS
+  ###  FREQUENCY MAPS  ########################################################
   # Show the frequence with which an AEP is implemented in every polygons
   
   # Join 
@@ -403,9 +355,9 @@ and cover crops"))
       summarize(freq2 = sum(freq))
     
     # Write shp
-    #z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_0708/habcnt_freq_map_", m, "cluster_", n, "_1009_new.shp"))
-    #write_sf(lu_Schoeps_AEP_freq_meas_group, z)
-    
+    z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_0708/habcnt_freq_map_", m, "cluster_", n, "_1009_new.shp"))
+    write_sf(lu_Schoeps_AEP_freq_meas_group, z)
+
     # Create buffer around polygon
     meas_buffer <- lu_Schoeps_AEP_freq_meas_group %>%
       st_buffer(35.00)
@@ -417,25 +369,7 @@ and cover crops"))
 }
 
 
-# z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/table.csv")
-# write.csv(table, z)
 
 
-
-freq_cl1 <- Impl_AEP_bind %>%
-  select("nswrm", "name_new", "freq")
-freq_cl1$id <- paste(freq_cl1$nswrm, freq_cl1$name_new, sep = "_")
-
-freq_cl2 <- Impl_AEP_bind %>%
-  select("nswrm", "name_new", "freq")
-freq_cl2$id <- paste(freq_cl2$nswrm, freq_cl2$name_new, sep = "_")
-
-
-freq_join <- freq_cl1 %>%
-  left_join(freq_cl2, by = "id")
-
-
-z <- file.path("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_HabCnt.csv")
-write.csv(freq_join, z)
 
 
