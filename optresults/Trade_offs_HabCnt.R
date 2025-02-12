@@ -90,42 +90,27 @@ ggsave(file = "plots/ParetoFrontier_HabCnt3_legend.png",
 ### ANALYSIS RANGE OF THE TRADE-OFFS
 # Range of trade-offs: variation between min and max
 # Decrease AgrPrd
-AgrPrd_dec <- min(BS_fitness$AgrPrd) - max(BS_fitness$AgrPrd)
-# Increase WtrQlt
-WtrQlt_inc <- min(BS_fitness$WtrQlt) - max(BS_fitness$WtrQlt)
-# Increase HbtCnt
-HabCnt_inc <- max(BS_fitness$HabCnt) - min(BS_fitness$HabCnt)
-# Increase HbtQlt
-HabQlt_inc <- max(BS_fitness$HabQlt) - min(BS_fitness$HabQlt) 
+#AgrPrd_dec <- min(BS_fitness_HabCnt$AgrPrd) - max(BS_fitness_HabCnt$AgrPrd)
+# Increase HbtCnt insects
+HabCnt_ins_inc <- max(BS_fitness_HabCnt$HabCnt_ins) - min(BS_fitness_HabCnt$HabCnt_ins)
+# Increase HbtCnt birds
+HabCnt_bird_inc <- max(BS_fitness_HabCnt$HabCnt_bird) - min(BS_fitness_HabCnt$HabCnt_bird)
+# Increase HbtCnt insects
+HabCnt_mamm_inc <- max(BS_fitness_HabCnt$HabCnt_mamm) - min(BS_fitness_HabCnt$HabCnt_mamm)
+
 
 
 # Range of trade-offs: percentage variation between min and max
-# Variation AgrPrd
-AgrPrd_var <- ((min(BS_fitness$AgrPrd)/max(BS_fitness$AgrPrd)) * 100) - 100
-# Increase WtrQlt
-WtrQlt_var <- 100 - ((max(BS_fitness$WtrQlt)/min(BS_fitness$WtrQlt)) * 100)
-# Increase HbtCnt
-HabCnt_var <- ((max(BS_fitness$HabCnt)/min(BS_fitness$HabCnt)) * 100) - 100
-# Increase HbtQlt
-HabQlt_var <- ((max(BS_fitness$HabQlt)/min(BS_fitness$HabQlt)) * 100) - 100
+HabCnt_ins_var <- ((max(BS_fitness_HabCnt$HabCnt_ins)/min(BS_fitness_HabCnt$HabCnt_ins)) * 100) - 100
+HabCnt_bird_var <- ((max(BS_fitness_HabCnt$HabCnt_bird)/min(BS_fitness_HabCnt$HabCnt_bird)) * 100) - 100
+HabCnt_mamm_var <- ((max(BS_fitness_HabCnt$HabCnt_mamm)/min(BS_fitness_HabCnt$HabCnt_mamm)) * 100) - 100
 
 
 # Percentage increse/decrease from status quo
-# Decrease AgrPrd
-AgrPrd_decSQ <- ((StatusQuo$AgrPrd - min(BS_fitness$AgrPrd)) / StatusQuo$AgrPrd) * 100
-# Increase AgrPrd
-AgrPrd_inccSQ <- ((StatusQuo$AgrPrd - max(BS_fitness$AgrPrd)) / StatusQuo$AgrPrd) * 100
-# Increase WtrQlt
-WtrQlt_incSQ <- ((StatusQuo$WtrQlt - max(BS_fitness$WtrQlt)) / StatusQuo$WtrQlt) * 100
-# # Increase HbtCnt
-HabCnt_incSQ <- ((max(BS_fitness$HabCnt) - (StatusQuo$HabCnt)) / StatusQuo$HabCnt) * 100
-# Increase HbtQlt
-HabQlt_incSQ <- ((max(BS_fitness$HabQlt) - (StatusQuo$HabQlt)) / StatusQuo$HabQlt) * 100
-
-
-AgrPrd_decSQ - (AgrPrd_inccSQ)
-
-
+# Increase HbtCnt
+HabCnt_ins_incSQ <- ((max(BS_fitness_HabCnt$HabCnt_ins) - (StatusQuo$HabCnt_ins)) / StatusQuo$HabCnt_ins) * 100
+HabCnt_bird_incSQ <- ((max(BS_fitness_HabCnt$HabCnt_bird) - (StatusQuo$HabCnt_bird)) / StatusQuo$HabCnt_bird) * 100
+HabCnt_mamm_incSQ <- ((max(BS_fitness_HabCnt$HabCnt_mamm) - (StatusQuo$HabCnt_mamm)) / StatusQuo$HabCnt_mamm) * 100
 
 
 

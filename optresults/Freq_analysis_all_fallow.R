@@ -21,8 +21,8 @@ library(units) # for drop units
 ## Set working directories
 # Working directory for land use map
 setwd("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis")
-path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fallow', sep="/")
-#path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fallow_fert', sep="/")
+#path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fallow', sep="/")
+path = paste(getwd(),'CoMOLA_results_june2024/Scenario_fallow_fert', sep="/")
 path_input = paste(getwd(),'DATA/input', sep="/")
 
 
@@ -34,7 +34,7 @@ BS_fitness <- read.csv(paste0(path,'/pareto_fitness.txt'), h = F, as.is=T, sep =
 names(BS_fitness) <- c("HabCnt", "HabQlt", "WtrQlt", "AgrPrd")
 # Add id column for join
 # it depends on the scenario that is analyzed
-BS_fitness$X <- c(1:1294)
+BS_fitness$X <- c(1:1238)
 
 
 # Genome Best Solutions
@@ -155,7 +155,7 @@ Impl_AEP_singlemeas <-  x %>%
 
 
 ## Modify genome based on priorities
-n_genomes = 1294                           # change based on no. best solutions
+n_genomes = 1238                          # change based on no. best solutions
 
 # 3 measures implementable
 Impl_AEP_3meas_copy <- Impl_AEP_3meas
@@ -215,13 +215,13 @@ Impl_AEP_bind <- Impl_AEP_singlemeas %>%
 
 ### FREQUENCY ANALYSIS  ########################################################
 # Number of times a measures is implemented across the Best solutions
-Impl_AEP_bind$count <- apply(Impl_AEP_bind[7:1300], 1,      # change based on no. best solutions
+Impl_AEP_bind$count <- apply(Impl_AEP_bind[7:1244], 1,      # change based on no. best solutions
                              function(x) length(which(x =="2")))
 
 # Calculate frequency
 Impl_AEP_bind <- Impl_AEP_bind%>%
   relocate(count, .after = name_new) %>%
-  mutate(freq = (count / 1294) * 100, .after = count)   # change based on no. best solutions
+  mutate(freq = (count / 1238) * 100, .after = count)   # change based on no. best solutions
 
 
 # Group the polygons of the same AEP
@@ -283,8 +283,8 @@ vplot
 
 
 # Save plot
-ggsave(file = "Frequency_violinplot_scenario_fallow_fert_0901.png",
-       width = 297, height = 210, units = "mm")
+ggsave(file = "Frequency_violinplot_scenario_fallow_fert2_1102.png",
+       width = 297, height = 150, units = "mm")
 
 
 

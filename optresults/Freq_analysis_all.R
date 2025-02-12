@@ -282,8 +282,8 @@ vplot
 
 
 # Save plot
-ggsave(file = "Frequency_violinplot_all_1112_jitter.png",
-          width = 297, height = 170, units = "mm")
+ggsave(file = "Frequency_violinplot_all_1102_jitter.png",
+          width = 297, height = 150, units = "mm")
 
 
 
