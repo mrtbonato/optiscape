@@ -45,7 +45,7 @@ StatusQuo[1,] <- c(0.00161, 0.0508, -6038.0, 59083.86)
 # Plot complete Pareto frontier
 p1 <- ggplot() +
   geom_point(data = BS_fitness, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt), shape = 21, color = "black") +
-  geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd), shape = 25, size = 5, fill= "black", color = "gray50") +
+  geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt), shape = 21, color = "gray50") +
   #geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt)) +
   # Change names labels
   labs(x = "Phorsphorus load [kg/year]",
@@ -53,13 +53,13 @@ p1 <- ggplot() +
   theme(text=element_text(size=18)) +
   scale_fill_viridis_c(name = "Probability of
 connectivity") +
-  scale_size(name = "Fertilizer
-run-off")
+  scale_size(name = "Habitat quality
+index")
 
 p1
 
 # Save plot
-ggsave(file = "plots/ParetoFrontier_baseline_1112.png",
+ggsave(file = "plots/ParetoFrontier_baseline_040325.png",
        width = 297, height = 130, units = "mm")
 
 
@@ -176,7 +176,7 @@ p2 <- ggplot() +
   #geom_point(data = ordered, aes(x= WtrQlt, y = AgrPrd), colour = 'darkred') +
   geom_line(data = ordered, aes(x= WtrQlt, y = AgrPrd), colour = 'darkred', size = 2) +
   # Change names labels
-  labs(x = "Phorsphorus load [kg/year]",
+  labs(x = "Phorsphorus load [kg/y]",
        y = "Crop yield [grain unit]") +
   theme(text=element_text(size=34))
 
@@ -184,7 +184,7 @@ p2
 
 # Save plot
 ggsave(file = "plots/TO_agr_wtr.png",
-       width = 297, height = 170, units = "mm")
+       width = 297, height = 150, units = "mm")
 
 
 # Range of trade-offs: percentage variation between min and max
@@ -219,7 +219,7 @@ p3
 
 # Save plot
 ggsave(file = "plots/TO_agr_conn.png",
-       width = 297, height = 170, units = "mm")
+       width = 297, height = 150, units = "mm")
 
 
 # Range of trade-offs: percentage variation between min and max
@@ -245,7 +245,7 @@ p4 <- ggplot() +
   #geom_point(data = ordered, aes(x= HabQlt, y = AgrPrd), colour = 'darkred') +
   geom_line(data = ordered, aes(x= HabQlt, y = AgrPrd), colour = 'darkred', size = 2) +
   # Change names labels
-  labs(x = "Fertilizer run-off",
+  labs(x = "Habitat quality index",
        y = "Crop yield [grain unit]") + 
   theme(text=element_text(size=34))
 
@@ -253,7 +253,7 @@ p4
 
 # Save plot
 ggsave(file = "plots/TO_agr_qual.png",
-       width = 297, height = 170, units = "mm")
+       width = 297, height = 150, units = "mm")
 
 
 # Range of trade-offs: percentage variation between min and max
@@ -280,14 +280,14 @@ p5 <- ggplot() +
   geom_line(data = ordered, aes(x= HabCnt, y = WtrQlt), colour = 'darkred', size = 2) +
   # Change names labels
   labs(x = "Probability of connectivity",
-       y = "Phorsphorus load [kg/year]") + 
+       y = "Phorsphorus load [kg/y]") + 
   theme(text=element_text(size=34))
 
 p5
 
 # Save plot
 ggsave(file = "plots/TO_wtr_conn.png",
-       width = 297, height = 170, units = "mm")
+       width = 297, height = 150, units = "mm")
 
 
 # Range of trade-offs: percentage variation between min and max
@@ -313,15 +313,15 @@ p6 <- ggplot() +
   #geom_point(data = ordered, aes(x= HabQlt , y = WtrQlt), colour = 'darkred') +
   geom_line(data = ordered, aes(x= HabQlt , y = WtrQlt), colour = 'darkred', size = 2) +
   # Change names labels
-  labs(x = "Fertilizer run-off",
-       y = "Phorsphorus load [kg/year]") + 
+  labs(x = "Habitat quality index",
+       y = "Phorsphorus load [kg/y]") + 
   theme(text=element_text(size=34)) 
 
 p6
 
 # Save plot
 ggsave(file = "plots/TO_wtr_qual.png",
-       width = 297, height = 170, units = "mm")
+       width = 297, height = 150, units = "mm")
 
 
 # Range of trade-offs: percentage variation between min and max
@@ -348,14 +348,14 @@ p7 <- ggplot() +
   #geom_line(data = ordered, aes(x= HabCnt, y = HabQlt), colour = 'darkred') +
   # Change names labels
   labs(y = "Probability of connectivity",
-       x = "Fertilizer run-off") + 
+       x = "Habitat quality index") + 
   theme(text=element_text(size=32))
 
 p7
 
 # Save plot
 ggsave(file = "plots/TO_conn_qual.png",
-       width = 297, height = 170, units = "mm")
+       width = 297, height = 150, units = "mm")
 
 
 # Range of trade-offs: percentage variation between min and max

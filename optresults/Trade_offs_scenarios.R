@@ -56,7 +56,7 @@ StatusQuo[1,] <- c(0.00161, 0.0508, -6038.0, 59083.86)
 # Plot complete Pareto frontier for baseline and reduced fertilization scenario
 p1 <- ggplot() +
   # plot status quo
-  geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd), shape = 25, size = 5, fill= "black", color = "gray50") +
+  geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt), shape = 21, color = "gray50") +
   # plot baseline scenario
   geom_point(data = BS_fitness_baseline, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt), shape = 21, color = "black") +
   # plot fertilization scenario
@@ -67,14 +67,14 @@ p1 <- ggplot() +
   lims(y = c(55500, 59500)) +
   scale_fill_viridis_c(name = "Probability of 
 connectivity", limits = c(0.00161, 0.00196)) +
-  scale_size(name = "Fertilizer
-run-off", limits = c(0.0508, 0.058)) +
+  scale_size(name = "Habitat quality
+index", limits = c(0.0508, 0.058)) +
   theme(text=element_text(size=24))
 
 p1
 
 # Save plot
-ggsave(file = "plots/ParetoFrontier_confscenario_bas_fert.png",
+ggsave(file = "plots/ParetoFrontier_confscenario_bas_fert_050325.png",
        width = 270, height = 297, units = "mm")
 
 
@@ -82,7 +82,7 @@ ggsave(file = "plots/ParetoFrontier_confscenario_bas_fert.png",
 # Plot complete Pareto frontier for baseline and reduced fertilization scenario
 p2 <- ggplot() +
   # plot status quo
-  geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd), shape = 25, size = 5, fill= "black", color = "gray50") +
+  geom_point(data = StatusQuo, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt), shape = 21, color = "gray50") +
   # plot fallow scenario
   geom_point(data = BS_fitness_scenario_fa, aes(x = WtrQlt, y = AgrPrd, fill = HabCnt, size = HabQlt), shape = 21, color = "black") +
   # plot fallow and fertilization scenarios
@@ -93,14 +93,14 @@ p2 <- ggplot() +
   lims(y = c(55500, 59500)) +
   scale_fill_viridis_c(name = "Probability of 
 connectivity", limits = c(0.00161, 0.00196)) +
-  scale_size(name = "Fertilizer
-run-off", limits = c(0.0508, 0.058)) +
+  scale_size(name = "Habitat quality
+index", limits = c(0.0508, 0.058)) +
   theme(text=element_text(size=24))
 
 p2
 
 # Save plot
-ggsave(file = "plots/ParetoFrontier_confscenario_fallow_fert.png",
+ggsave(file = "plots/ParetoFrontier_confscenario_fallow_fert_050325.png",
        width = 270, height = 297, units = "mm")
 
 

@@ -44,7 +44,6 @@ BS_genome <- BS_genome %>%
 
 
 
-
 ### MODIFY GENOME TABLE BASED ON PRIORITY OF IMPEMENTATION OF AEP ##############
 # becauSe 2 or more AEP cannot be implemented at the same time in the same hru
 
@@ -260,8 +259,9 @@ vplot <- Impl_AEP_bind%>%
   stat_summary(fun.y=mean, geom="point", shape=20, size=4, color="black", fill="black") +
   #stat_summary(fun.y=mean, geom="text", vjust=-0.7) +
   geom_text(data = Mean_freq, aes(label = round(freq_mean, digits = 1), y = freq_mean + 0.5), size = 5, nudge_x = 0.20) +
+  theme_minimal() +
   theme(legend.position="none", text=element_text(size=20)) +
-  labs(x = "Agri-Environmental Practices",
+  labs(x = "Agri-environmental practices",
        y = "Frequency of implementation (%)") + 
   # change labels name
   # change labels name
@@ -282,7 +282,7 @@ vplot
 
 
 # Save plot
-ggsave(file = "Frequency_violinplot_all_1102_jitter.png",
+ggsave(file = "Frequency_violinplot_all_3103_jitter.png",
           width = 297, height = 150, units = "mm")
 
 
@@ -337,6 +337,9 @@ for (m in meas){
   z <- file.path(paste0("Y:/Gruppen/cle/MichaS/Marta/Optimization_Analysis/DATA/output/freq_map_", m, "_buffer_0608.shp"))
   write_sf(meas_buffer, z)
 }
+
+
+
 
 
 
