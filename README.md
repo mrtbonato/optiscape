@@ -1,6 +1,7 @@
 # optiscape
 
-The codes support the analysis included in the paper: Bonato M., Burian A., Equihua J.A., Bartowski B. Cord A. F., Strauch, M. (in preparation). Optimizing the spatial allocation of Agri-Environmental Practices to minimize trade-offs and achieve win-win solutions in multifunctional landscapes
+The codes support the analysis included in the paper: Bonato M., Burian A., Equihua J.A., Bartowski B. Cord A. F., Strauch, M. (in preparation). Minimizing trade-offs in agricultural landscapes through optimal spatial allocation of
+agri-environmental practices.
 
 
 
